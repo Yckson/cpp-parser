@@ -1,0 +1,1 @@
+{"./teste/teste_exception.py": [[["def", "risky_operation", "x"], [0, 0], [0, 21]], [["try", "result", "=", "10", "/", "x", "print", "result"], [1, 4], [3, 20]], [["except", "ZeroDivisionError", "print", "\"Divided by zero!\"", "Divided by zero!"], [4, 4], [5, 31]], [["finally", "print", "\"Done\"", "Done", "return", "result"], [6, 4], [8, 17]]]}

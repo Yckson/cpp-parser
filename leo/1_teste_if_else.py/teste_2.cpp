@@ -4,6 +4,7 @@ int teste (int x){
     }
     else if (x == 0) {
         return 0;
+        x = 5;
     }
     else{
         return -1;

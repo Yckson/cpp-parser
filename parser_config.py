@@ -18,7 +18,7 @@ LANGUAGE_CONFIG = {
         },
         "branch": (
             "function_definition",
-            "if_statement",
+            "if_statement", "elif_clause", "else_clause",
             "for_statement", "while_statement",
             "try_statement", "except_clause", "finally_clause",
             "with_statement",

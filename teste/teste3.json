@@ -1,1 +1,1 @@
-{"./teste/teste3.py": [[["def", "hello", "x", "=", "10"], [0, 0], [1, 10]], [["if", "x", ">", "5", "print", "\"Greater\"", "Greater", "else", "print", "\"Less\"", "Less", "return", "x", "hello"], [2, 4], [8, 5]]]}
+{"./teste/teste3.py": [[["def", "hello", "x", "=", "10"], [0, 0], [1, 10]], [["if", "x", ">", "5", "print", "\"Greater\"", "Greater", "else", "print", "\"Less\"", "Less", "return", "x"], [2, 4], [6, 12]], [["hello"], [8, 0], [8, 5]]]}

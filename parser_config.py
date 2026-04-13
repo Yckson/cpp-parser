@@ -8,6 +8,7 @@ LANGUAGE_CONFIG = {
         "name": "Python3",
         "parser_lib": "tree_sitter_python",
         "file_pattern": "*.py",
+        "terminators": ("return", "break", "continue", "raise"),
         "operators": {
             "arithmetic": ("+", "-", "*", "/", "//", "%", "**", "@"),
             "assignment": ("=", "+=", "-=", "*=", "/=", "//=", "%=", "**=", "&=", "|=", "^=", ">>=", "<<=", ":="),
@@ -43,6 +44,7 @@ LANGUAGE_CONFIG = {
         "name": "C",
         "parser_lib": "tree_sitter_c",
         "file_pattern": "*.c",
+        "terminators": ("return", "goto", "break", "continue"),
         "operators": {
             "arithmetic": ("+", "++", "-", "--", "*", "/", "%"),
             "assignment": ("=", "+=", "-=", "*=", "/=", "%=", "&=", "|=", "^=", ">>=", "<<="),
@@ -73,6 +75,7 @@ LANGUAGE_CONFIG = {
         "name": "C++",
         "parser_lib": "tree_sitter_cpp",
         "file_pattern": "*.cpp",
+        "terminators": ("return", "goto", "break", "continue", "co_return", "throw"),
         "operators": {
             "arithmetic": ("+", "++", "-", "--", "*", "/", "%", "->*", ".*"),  # +2 member operators
             "assignment": ("=", "+=", "-=", "*=", "/=", "%=", "&=", "|=", "^=", ">>=", "<<="),

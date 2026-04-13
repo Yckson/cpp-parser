@@ -160,7 +160,7 @@ Bloco 1: [if, a, >, 0, x, =, 1, else, if, b, >, 0, x, =, 2, else, x, =, 3]
 ```python
 branch = (
     # ... (todos do C)
-    "labeled_statement",        # label: (correto agora!)
+    "labeled_statement",        # label
     "try_statement",            # try-catch
     "catch_clause",             # catch
     "class_specifier",          # class

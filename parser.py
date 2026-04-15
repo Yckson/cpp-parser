@@ -82,6 +82,25 @@ def get_terminator_statement_end_point(node):
     return node.end_point
 
 
+def is_conditional_goto(node):
+    """Retorna True se o token 'goto' está sob estrutura condicional relevante."""
+    conditional_context = {
+        "if_statement",
+        "else_clause",
+        "try_statement",
+        "catch_clause",
+    }
+
+    current = node.parent
+    while current is not None:
+        if current.type in conditional_context:
+            return True
+        if current.type in ("function_definition", "translation_unit"):
+            return False
+        current = current.parent
+    return False
+
+
 def basic_block(nodes, language):
     """
     Divide nós em blocos básicos parametrizados pela linguagem
@@ -129,11 +148,11 @@ def basic_block(nodes, language):
             terminator_statement_end_point = None
 
         # Lógica de divisão de blocos
-        if len(last_block) > 0 and node.type in branch:
-            should_split = True
+        if node.type in branch:
+            should_split = len(last_block) > 0
 
             # C/C++: no 'else if', o bloco deve começar no 'else' e continuar no 'if'
-            if language in ("c", "cpp") and node.type == "if_statement":
+            if should_split and language in ("c", "cpp") and node.type == "if_statement":
                 parent = node.parent
                 if parent is not None and parent.type == "else_clause":
                     should_split = False
@@ -145,19 +164,58 @@ def basic_block(nodes, language):
                 if is_prev_case and not has_break:
                     should_split = False
 
-            # Criar novo bloco se deve dividir ou há gap temporal
-            if should_split or basic_block_branch_end_point < node.start_point:
+            # Criar novo bloco quando necessário.
+            # Para case sem break (fall-through), não dividir por gap temporal.
+            should_split_by_gap = basic_block_branch_end_point < node.start_point
+            if should_split or (node.type != "case_statement" and should_split_by_gap):
                 basic_block_list.append([])
                 basic_block_index = basic_block_index + 1
                 basic_block_branch_end_point = node.end_point
 
+            # Mantém o alcance do último branch atualizado mesmo sem split,
+            # necessário para separar tokens que aparecem após sair do switch/if.
+            elif basic_block_branch_end_point < node.end_point:
+                basic_block_branch_end_point = node.end_point
+
         # Capturar token se é tipo relevante
         if node.type in arithmetic + assignment + bitwise + comparison + logical + word + types:
+            # C++: garante que comandos após o bloco `catch { ... }` não fiquem
+            # colados no mesmo bloco básico do catch.
+            if (
+                language == "cpp"
+                and len(last_block) > 0
+                and last_block[0][1] == "catch"
+                and basic_block_branch_end_point < node.start_point
+            ):
+                basic_block_list.append([])
+                basic_block_index = basic_block_index + 1
+                last_block = basic_block_list[basic_block_index]
+
+            # Se saiu do alcance do último branch, inicia novo bloco no próximo token.
+            if (
+                len(last_block) > 0
+                and last_block[0][1] in ("case", "default")
+                and basic_block_branch_end_point < node.start_point
+            ):
+                basic_block_list.append([])
+                basic_block_index = basic_block_index + 1
+                last_block = basic_block_list[basic_block_index]
+
+            # Python: evita duplicar literais de string ("x" + x) quando
+            # tree-sitter emite ambos: string e string_content.
+            if language == "python" and node.type == "string_content":
+                parent = node.parent
+                if parent is not None and parent.type == "string":
+                    continue
+
             token_text = preprocessor(str(node.text, "utf-8"))
             basic_block_list[basic_block_index].append((node.type, token_text, node.start_point, node.end_point))
 
             # Terminadores encerram o bloco atual; próximo token inicia novo bloco
             if token_text in terminators:
+                # goto só encerra bloco quando for desvio condicional (ex.: dentro de if)
+                if token_text == "goto" and language in ("c", "cpp") and not is_conditional_goto(node):
+                    continue
                 split_after_terminator = True
                 terminator_statement_end_point = get_terminator_statement_end_point(node)
 

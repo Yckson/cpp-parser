@@ -57,7 +57,6 @@ LANGUAGE_CONFIG = {
             "if_statement", "else_clause",
             "case_statement",
             "do_statement", "for_statement", "while_statement",
-            "labeled_statement",
         ),
         "types": (
             "character", "#define", "identifier", "field_identifier", "null",
@@ -88,7 +87,6 @@ LANGUAGE_CONFIG = {
             "if_statement", "else_clause",
             "switch_statement", "case_statement",
             "do_statement", "for_statement", "for_range_loop", "while_statement",
-            "labeled_statement",
             # C++ specific
             "try_statement", "catch_clause",
             "class_specifier",

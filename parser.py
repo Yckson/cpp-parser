@@ -101,6 +101,25 @@ def is_conditional_goto(node):
     return False
 
 
+def is_empty_case_statement(node):
+    """Retorna True quando um case/default não possui corpo executável."""
+    if node is None or node.type != "case_statement":
+        return False
+
+    value_node = node.child_by_field_name("value")
+    for child in node.named_children:
+        if (
+            value_node is not None
+            and child.type == value_node.type
+            and child.start_point == value_node.start_point
+            and child.end_point == value_node.end_point
+        ):
+            continue
+        return False
+
+    return True
+
+
 def basic_block(nodes, language):
     """
     Divide nós em blocos básicos parametrizados pela linguagem
@@ -126,6 +145,7 @@ def basic_block(nodes, language):
     basic_block_branch_end_point = basic_block_file_end_point
     split_after_terminator = False
     terminator_statement_end_point = None
+    previous_case_statement_node = None
 
     # Processar cada nó
     for node in nodes:
@@ -157,11 +177,12 @@ def basic_block(nodes, language):
                 if parent is not None and parent.type == "else_clause":
                     should_split = False
 
-            # Exception 2: case sem break (fall-through) não divide
+            # Exception 2: case sem break só não divide quando o case anterior é vazio
             if node.type == "case_statement" and len(last_block) > 0:
                 is_prev_case = last_block[0][0] == "case"
                 has_break = last_block[-1][0] == "break"
-                if is_prev_case and not has_break:
+                previous_case_is_empty = is_empty_case_statement(previous_case_statement_node)
+                if is_prev_case and not has_break and previous_case_is_empty:
                     should_split = False
 
             # Criar novo bloco quando necessário.
@@ -177,8 +198,21 @@ def basic_block(nodes, language):
             elif basic_block_branch_end_point < node.end_point:
                 basic_block_branch_end_point = node.end_point
 
+            if node.type == "case_statement":
+                previous_case_statement_node = node
+
         # Capturar token se é tipo relevante
         if node.type in arithmetic + assignment + bitwise + comparison + logical + word + types:
+            if len(last_block) == 0 and basic_block_branch_end_point < node.start_point:
+                basic_block_branch_end_point = get_terminator_statement_end_point(node)
+
+            # Se saiu do alcance do último branch, inicia novo bloco no próximo token.
+            if len(last_block) > 0 and basic_block_branch_end_point < node.start_point:
+                basic_block_list.append([])
+                basic_block_index = basic_block_index + 1
+                last_block = basic_block_list[basic_block_index]
+                basic_block_branch_end_point = get_terminator_statement_end_point(node)
+
             # C++: garante que comandos após o bloco `catch { ... }` não fiquem
             # colados no mesmo bloco básico do catch.
             if (

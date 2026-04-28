@@ -96,11 +96,12 @@ def c_basic_block_split(basic_block, branch, current_end_point, node):
     else_if = False
 
     if node.type in branch and len(basic_block[-1]) > 0:
-        # Exception 1: case sem break não divide (fall-through)
+        # Exception 1: case sem break só não divide se o case anterior for vazio
         case_without_break = not (
             node.type == "case_statement" and
             basic_block[-1][0][0] == "case" and
-            basic_block[-1][-1][0] != "break"
+            basic_block[-1][-1][0] != "break" and
+            previous_case_is_empty
         )
 
         # Exception 2: else if não divide bloco
@@ -119,10 +120,11 @@ def c_basic_block_split(basic_block, branch, current_end_point, node):
 switch (a) {
     case 1:
         x = 1;          // BLOCO 1
-    case 2:             // NÃO divide (fall-through)
+    case 2:             // DIVIDE (case anterior não é vazio)
         x = 2;          // BLOCO 2 (continua do anterior)
         break;
-    case 3:             // Divide (tem break anterior)
+    case 3:
+    case 4:             // NÃO divide (case 3 está vazio)
         x = 3;          // BLOCO 3
         break;
 }
@@ -130,8 +132,9 @@ switch (a) {
 
 **Output:**
 ```
-Bloco 1: [case, 1, x, =, 1, case, 2, x, =, 2, break]
-Bloco 2: [case, 3, x, =, 3, break]
+Bloco 1: [case, 1, x, =, 1]
+Bloco 2: [case, 2, x, =, 2, break]
+Bloco 3: [case, 3, case, 4, x, =, 3, break]
 ```
 
 ### Exemplo: else if
@@ -201,11 +204,11 @@ def cpp_basic_block(nodes):
             if node.type == "if_statement" and len(last_block) > 0 and last_block[-1][0] == "else":
                 should_split = False
 
-            # Exception 2: case sem break não divide
+            # Exception 2: case sem break só não divide se o case anterior for vazio
             elif node.type == "case_statement" and len(last_block) > 0:
                 is_prev_case = last_block[0][0] == "case"
                 has_break = last_block[-1][0] == "break"
-                if is_prev_case and not has_break:
+                if is_prev_case and not has_break and previous_case_is_empty:
                     should_split = False
 
             # Divide se deve ou se há espaço

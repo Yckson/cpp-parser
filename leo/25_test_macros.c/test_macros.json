@@ -1,0 +1,1 @@
+{"teste\\test_macros.c": [[["define", "INC", "x", "((x)+1)"], [0, 0], [0, 22]], [["int", "f", "int", "x", "x", "=", "INC", "x", "return", "x"], [2, 0], [4, 12]]]}

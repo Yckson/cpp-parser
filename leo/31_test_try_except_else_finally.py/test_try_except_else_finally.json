@@ -1,0 +1,1 @@
+{"teste\\test_try_except_else_finally.py": [[["def", "f", "x"], [0, 0], [0, 7]], [["try", "y", "=", "10", "/", "x"], [1, 4], [2, 18]], [["except", "ZeroDivisionError", "return", "0"], [3, 4], [4, 16]], [["else", "return", "y"], [5, 4], [6, 16]], [["finally", "print", "\"fim\""], [7, 4], [8, 19]]]}

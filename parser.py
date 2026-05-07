@@ -120,6 +120,27 @@ def is_empty_case_statement(node):
     return True
 
 
+def is_empty_case_clause(node):
+    """Retorna True quando um case do match nao possui corpo executavel."""
+    if node is None or node.type != "case_clause":
+        return False
+
+    block = None
+    for child in node.named_children:
+        if child.type == "block":
+            block = child
+            break
+
+    if block is None:
+        return False
+
+    for child in block.named_children:
+        if child.type != "pass_statement":
+            return False
+
+    return True
+
+
 def basic_block(nodes, language):
     """
     Divide nós em blocos básicos parametrizados pela linguagem
@@ -146,6 +167,8 @@ def basic_block(nodes, language):
     split_after_terminator = False
     terminator_statement_end_point = None
     previous_case_statement_node = None
+    previous_case_clause_node = None
+    lambda_start_points = set()
 
     # Processar cada nó
     for node in nodes:
@@ -185,6 +208,12 @@ def basic_block(nodes, language):
                 if is_prev_case and not has_break and previous_case_is_empty:
                     should_split = False
 
+            # Python: case vazio do match nao divide, junta com o proximo case.
+            if node.type == "case_clause" and len(last_block) > 0:
+                previous_case_is_empty = is_empty_case_clause(previous_case_clause_node)
+                if previous_case_is_empty:
+                    should_split = False
+
             # Criar novo bloco quando necessário.
             # Para case sem break (fall-through), não dividir por gap temporal.
             should_split_by_gap = basic_block_branch_end_point < node.start_point
@@ -200,6 +229,8 @@ def basic_block(nodes, language):
 
             if node.type == "case_statement":
                 previous_case_statement_node = node
+            if node.type == "case_clause":
+                previous_case_clause_node = node
 
         # Capturar token se é tipo relevante
         if node.type in arithmetic + assignment + bitwise + comparison + logical + word + types:
@@ -242,6 +273,18 @@ def basic_block(nodes, language):
                 if parent is not None and parent.type == "string":
                     continue
 
+            # Python: evita duplicar o token "lambda" quando o no completo
+            # da expressao lambda ja foi capturado.
+            if language == "python" and node.type == "lambda":
+                lambda_start_points.add(node.start_point)
+            elif (
+                language == "python"
+                and node.type in word
+                and preprocessor(str(node.text, "utf-8")) == "lambda"
+                and node.start_point in lambda_start_points
+            ):
+                continue
+
             token_text = preprocessor(str(node.text, "utf-8"))
             basic_block_list[basic_block_index].append((node.type, token_text, node.start_point, node.end_point))
 
@@ -252,6 +295,17 @@ def basic_block(nodes, language):
                     continue
                 split_after_terminator = True
                 terminator_statement_end_point = get_terminator_statement_end_point(node)
+
+            # Python: pass encerra o bloco do case em match, residuo vai para outro bloco.
+            if language == "python" and token_text == "pass":
+                current = node.parent
+                while current is not None and current.type != "case_clause":
+                    if current.type in ("function_definition", "module"):
+                        break
+                    current = current.parent
+                if current is not None and current.type == "case_clause":
+                    split_after_terminator = True
+                    terminator_statement_end_point = get_terminator_statement_end_point(node)
 
     return basic_block_list
 

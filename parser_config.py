@@ -24,6 +24,7 @@ LANGUAGE_CONFIG = {
             "with_statement",
             "class_definition",
             "match_statement",
+            "case_clause",
         ),
         "types": (
             "identifier", "relative_import", "dotted_name",

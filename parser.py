@@ -178,6 +178,7 @@ def basic_block(nodes, language):
         if is_docstring_node(node):
             continue
 
+
         # Se o bloco anterior terminou com terminador, inicia novo bloco
         if (
             split_after_terminator
@@ -273,19 +274,22 @@ def basic_block(nodes, language):
                 if parent is not None and parent.type == "string":
                     continue
 
-            # Python: evita duplicar o token "lambda" quando o no completo
-            # da expressao lambda ja foi capturado.
+            # Python: evita o token completo da expressao lambda e emite apenas "lambda".
             if language == "python" and node.type == "lambda":
+                if node.start_point in lambda_start_points:
+                    continue
                 lambda_start_points.add(node.start_point)
-            elif (
-                language == "python"
-                and node.type in word
-                and preprocessor(str(node.text, "utf-8")) == "lambda"
-                and node.start_point in lambda_start_points
-            ):
+                lambda_end_point = (node.start_point[0], node.start_point[1] + 6)
+                basic_block_list[basic_block_index].append(
+                    (node.type, "lambda", node.start_point, lambda_end_point)
+                )
                 continue
 
             token_text = preprocessor(str(node.text, "utf-8"))
+
+            # Python: evita duplicar "lambda" quando ja foi emitido pelo no lambda.
+            if language == "python" and token_text == "lambda" and node.type != "lambda":
+                continue
             basic_block_list[basic_block_index].append((node.type, token_text, node.start_point, node.end_point))
 
             # Terminadores encerram o bloco atual; próximo token inicia novo bloco
@@ -328,7 +332,7 @@ def parse_input(filename, language):
     for block in basic_blocks:
         if len(block) > 0:
             sentence = [token[1] for token in block]
-            corpus.append([sentence, point2tuple(block[0][2]), point2tuple(block[-1][3])])
+            corpus.append([sentence, point2tuple(block[0][2]), point2tuple(block[-1][3]), 1.0])
 
     return corpus
 

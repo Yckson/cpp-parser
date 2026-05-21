@@ -106,7 +106,7 @@ for original_path in Path(ORIGINAL_DIR).rglob("*.json"):
     # STATUS
     # =========================
 
-    if diff_lines:
+    if not diff_lines:
         print(
             f"[FALHOU] {relative_path} | "
             f"Similaridade: {similarity:.4f}"

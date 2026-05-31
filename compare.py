@@ -494,62 +494,48 @@ for original_json_path in all_original_jsons:
     # =====================================================
 
     matches = []
-
     used_obfuscated = set()
 
+    # Loop nos blocos originais
     for original_block in original_blocks:
-
         best_score = -1.0
-
         best_block = None
-
-        original_text = (
-            original_block["normalized"]
-        )
+        original_text = original_block["normalized"]
 
         for obfuscated_block in obfuscated_blocks:
-
-            if (
-                obfuscated_block["index"]
-                in used_obfuscated
-            ):
+            if obfuscated_block["index"] in used_obfuscated:
                 continue
 
-            obfuscated_text = (
-                obfuscated_block["normalized"]
-            )
-
-            score = similarity(
-                original_text,
-                obfuscated_text
-            )
+            obfuscated_text = obfuscated_block["normalized"]
+            score = similarity(original_text, obfuscated_text)
 
             if score > best_score:
-
                 best_score = score
+                best_block = obfuscated_block
 
-                best_block = (
-                    obfuscated_block
-                )
-
-        if (
-            best_block is not None
-            and best_score > MIN_SIMILARITY
-        ):
-
-            used_obfuscated.add(
-                best_block["index"]
-            )
-
+        if best_block is not None and best_score > MIN_SIMILARITY:
+            used_obfuscated.add(best_block["index"])
             matches.append({
-
                 "original": original_block,
-
-                "obfuscated_block": (
-                    best_block
-                ),
-
+                "obfuscated_block": best_block,
                 "similarity": best_score
+            })
+        else:
+            # ORIGINAL SEM MATCH: é adicionado com score 0.0
+            matches.append({
+                "original": original_block,
+                "obfuscated_block": None,
+                "similarity": 0.0
+            })
+
+    # Loop para capturar blocos ofuscados que sobraram
+    for obfuscated_block in obfuscated_blocks:
+        if obfuscated_block["index"] not in used_obfuscated:
+            # OFUSCADO SEM MATCH: é adicionado com score 0.0
+            matches.append({
+                "original": None,
+                "obfuscated_block": obfuscated_block,
+                "similarity": 0.0
             })
 
     # =====================================================
@@ -594,88 +580,50 @@ for original_json_path in all_original_jsons:
     result_lines = []
 
     for m in matches:
+        original_block = m["original"]
+        obfuscated_block = m["obfuscated_block"]
+        similarity_score = m["similarity"]
 
-        original_block = (
-            m["original"]
-        )
-
-        obfuscated_block = (
-            m["obfuscated_block"]
-        )
-
-        similarity_score = (
-            m["similarity"]
-        )
-
-        original_lines = (
-            extract_source_code(
-
+        # Se houver bloco original, extrai o código normalmente, senão define padrões vazios
+        if original_block:
+            original_lines = extract_source_code(
                 original_source,
-
-                original_block[
-                    "start_line"
-                ],
-
-                original_block[
-                    "end_line"
-                ]
+                original_block["start_line"],
+                original_block["end_line"]
             )
-        )
+            orig_path = original_source_path.name
+            orig_start = original_block["start_line"]
+        else:
+            original_lines = []
+            orig_path = "Inexistente"
+            orig_start = 0
 
-        obfuscated_lines = (
-            extract_source_code(
-
+        # Se houver bloco ofuscado, extrai o código normalmente, senão define padrões vazios
+        if obfuscated_block:
+            obfuscated_lines = extract_source_code(
                 obfuscated_source,
-
-                obfuscated_block[
-                    "start_line"
-                ],
-
-                obfuscated_block[
-                    "end_line"
-                ]
+                obfuscated_block["start_line"],
+                obfuscated_block["end_line"]
             )
-        )
+            obf_path = obfuscated_source_path.name
+            obf_start = obfuscated_block["start_line"]
+        else:
+            obfuscated_lines = []
+            obf_path = "Inexistente"
+            obf_start = 0
 
         unified = build_unified_block(
-
             original_lines=original_lines,
-
-            obfuscated_lines=(
-                obfuscated_lines
-            ),
-
-            original_path=(
-                original_source_path.name
-            ),
-
-            obfuscated_path=(
-                obfuscated_source_path.name
-            ),
-
-            original_start_line=(
-                original_block[
-                    "start_line"
-                ]
-            ),
-
-            obfuscated_start_line=(
-                obfuscated_block[
-                    "start_line"
-                ]
-            ),
-
-            similarity_score=(
-                similarity_score
-            )
+            obfuscated_lines=obfuscated_lines,
+            original_path=orig_path,
+            obfuscated_path=obf_path,
+            original_start_line=orig_start,
+            obfuscated_start_line=obf_start,
+            similarity_score=similarity_score
         )
 
-        result_lines.append(
-            unified
-        )
-
+        result_lines.append(unified)
         result_lines.append("")
-
     # =====================================================
     # SAVE DIFF
     # =====================================================

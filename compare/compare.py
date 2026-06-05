@@ -1,6 +1,7 @@
 from pathlib import Path
 import json
 import csv
+import argparse
 from difflib import SequenceMatcher
 import difflib
 
@@ -9,12 +10,12 @@ import difflib
 # CONFIG
 # =========================================================
 
-ORIGINAL_DIR = "Original"
-OBFUSCATED_DIR = "Obfuscated"
+DEFAULT_ORIGINAL_DIR = "Original"
+DEFAULT_OBFUSCATED_DIR = "Obfuscated"
 
-DIFF_DIR = "diffs"
+DEFAULT_DIFF_DIR = "diffs"
 
-CSV_OUTPUT = "similarity_report.csv"
+DEFAULT_CSV_OUTPUT = "similarity_report.csv"
 
 # qualquer similaridade > 0
 MIN_SIMILARITY = 0.0
@@ -23,10 +24,6 @@ MIN_SIMILARITY = 0.0
 # =========================================================
 # PREPARAÇÃO
 # =========================================================
-
-Path(DIFF_DIR).mkdir(
-    exist_ok=True
-)
 
 csv_rows = []
 
@@ -105,6 +102,7 @@ def similarity(a, b):
 
 
 def find_source_file(
+    source_root,
     base_path_without_extension
 ):
 
@@ -119,6 +117,8 @@ def find_source_file(
     for ext in extensions:
 
         candidate = Path(
+            source_root
+        ) / Path(
             str(
                 base_path_without_extension
             ) + ext
@@ -365,6 +365,82 @@ def extract_blocks(parsed_json):
 # PROCESSAMENTO
 # =========================================================
 
+parser = argparse.ArgumentParser(
+    description=(
+        "Compara JSONs de blocos básicos e os arquivos-fonte "
+        "associados entre duas árvores de diretórios."
+    )
+)
+
+parser.add_argument(
+    "original_dir",
+    nargs="?",
+    default=DEFAULT_ORIGINAL_DIR,
+    help=(
+        "Diretório raiz com os JSONs e fontes da versão original. "
+        f"Padrão: {DEFAULT_ORIGINAL_DIR}"
+    )
+)
+
+parser.add_argument(
+    "obfuscated_dir",
+    nargs="?",
+    default=DEFAULT_OBFUSCATED_DIR,
+    help=(
+        "Diretório raiz com os JSONs e fontes da versão ofuscada. "
+        f"Padrão: {DEFAULT_OBFUSCATED_DIR}"
+    )
+)
+
+parser.add_argument(
+    "--diff-dir",
+    default=DEFAULT_DIFF_DIR,
+    help=(
+        "Diretório de saída para os arquivos .diff. "
+        f"Padrão: {DEFAULT_DIFF_DIR}"
+    )
+)
+
+parser.add_argument(
+    "--csv-output",
+    default=DEFAULT_CSV_OUTPUT,
+    help=(
+        "Arquivo CSV de saída com o resumo da similaridade. "
+        f"Padrão: {DEFAULT_CSV_OUTPUT}"
+    )
+)
+
+parser.add_argument(
+    "--original-source-dir",
+    default=None,
+    help=(
+        "Diretório raiz dos arquivos-fonte da versão original. "
+        "Se omitido, usa original_dir."
+    )
+)
+
+parser.add_argument(
+    "--obfuscated-source-dir",
+    default=None,
+    help=(
+        "Diretório raiz dos arquivos-fonte da versão ofuscada. "
+        "Se omitido, usa obfuscated_dir."
+    )
+)
+
+args = parser.parse_args()
+
+ORIGINAL_DIR = args.original_dir
+OBFUSCATED_DIR = args.obfuscated_dir
+DIFF_DIR = args.diff_dir
+CSV_OUTPUT = args.csv_output
+ORIGINAL_SOURCE_DIR = args.original_source_dir or ORIGINAL_DIR
+OBFUSCATED_SOURCE_DIR = args.obfuscated_source_dir or OBFUSCATED_DIR
+
+Path(DIFF_DIR).mkdir(
+    exist_ok=True
+)
+
 all_original_jsons = sorted(
 
     Path(
@@ -400,13 +476,19 @@ for original_json_path in all_original_jsons:
 
     original_source_path = (
         find_source_file(
-            original_json_path.with_suffix("")
+            ORIGINAL_SOURCE_DIR,
+            original_json_path.relative_to(
+                ORIGINAL_DIR
+            ).with_suffix("")
         )
     )
 
     obfuscated_source_path = (
         find_source_file(
-            obfuscated_json_path.with_suffix("")
+            OBFUSCATED_SOURCE_DIR,
+            obfuscated_json_path.relative_to(
+                OBFUSCATED_DIR
+            ).with_suffix("")
         )
     )
 

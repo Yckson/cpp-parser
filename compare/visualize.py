@@ -12,6 +12,7 @@ Opções úteis:
   --algorithms 1_diff,3_tfidf
   --file problema_102/source_118431.json
   --mode summary|blocks|both
+  --reference-csv results_jplag_dolos.csv
 """
 
 from __future__ import annotations
@@ -71,6 +72,11 @@ def build_parser() -> argparse.ArgumentParser:
         choices=("summary", "blocks", "both"),
         default="both",
         help="Seleciona o tipo de visualização a gerar.",
+    )
+    parser.add_argument(
+        "--reference-csv",
+        default=None,
+        help="Arquivo CSV contendo resultados do Jplag e Dolos para adicionar a linha de média.",
     )
     return parser
 
@@ -249,6 +255,7 @@ def create_summary_plot(
     selected_algorithms: list[str],
     problem_filter: str,
     output_path: Path,
+    reference_csv: Path | None = None,
 ) -> None:
     import matplotlib.pyplot as plt
 
@@ -281,6 +288,9 @@ def create_summary_plot(
         y_values = []
         for file_record in files:
             algo_file = file_record["algorithms"].get(algorithm_id)
+            # A multiplicação por 100 foi mantida aqui assumindo que a sua
+            # similaridade global ainda seja um float de 0 a 1. 
+            # Caso não seja, você pode remover o * 100 aqui também.
             y_values.append((algo_file["similarity"] * 100) if algo_file else None)
 
         ax.plot(
@@ -293,6 +303,61 @@ def create_summary_plot(
             color=colors(index % 10),
         )
 
+    # Processamento e injeção da linha do Jplag/Dolos
+    dolos_avg = None
+    jplag_avg = None
+    if reference_csv and reference_csv.exists() and problem_filter != "all":
+        # Extrai o ID numérico do filtro (ex: "problema_2" -> "2")
+        match = re.search(r'\d+', problem_filter)
+        if match:
+            problem_id = match.group(0)
+            dolos_total = 0.0
+            dolos_count = 0
+            jplag_total = 0.0
+            jplag_count = 0
+            with reference_csv.open("r", encoding="utf-8", newline="") as f:
+                for row in csv.DictReader(f):
+                    if row.get("Problem ID") == problem_id:
+                        try:
+                            if "Dolos Similarity (%)" in row and row["Dolos Similarity (%)"].strip():
+                                dolos_total += float(row["Dolos Similarity (%)"])
+                                dolos_count += 1
+                        except ValueError:
+                            pass
+                        
+                        try:
+                            if "Jplag Similarity (%)" in row and row["Jplag Similarity (%)"].strip():
+                                jplag_total += float(row["Jplag Similarity (%)"])
+                                jplag_count += 1
+                        except ValueError:
+                            pass
+            
+            if dolos_count > 0:
+                dolos_avg = dolos_total / dolos_count
+            if jplag_count > 0:
+                jplag_avg = jplag_total / jplag_count
+
+    # Adiciona as linhas tracejadas se os valores forem processados com sucesso
+    if dolos_avg is not None:
+        ax.axhline(
+            y=dolos_avg,
+            color="purple",
+            linestyle="--",
+            linewidth=1.5,
+            alpha=0.7,
+            label=f"Média Dolos ({dolos_avg:.1f}%)"
+        )
+    
+    if jplag_avg is not None:
+        ax.axhline(
+            y=jplag_avg,
+            color="brown",
+            linestyle="-.",
+            linewidth=1.5,
+            alpha=0.7,
+            label=f"Média Jplag ({jplag_avg:.1f}%)"
+        )
+
     ax.set_ylabel("Similaridade (%)")
     ax.set_xlabel("Arquivo")
     ax.set_ylim(0, 100)
@@ -303,7 +368,12 @@ def create_summary_plot(
     ax.set_xticks(x_positions)
     ax.set_xticklabels(labels, rotation=60, ha="right", fontsize=8)
     ax.grid(True, axis="y", alpha=0.25)
-    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.16), ncol=max(1, len(selected_algorithms)))
+    
+    # Ajusta o número de colunas da legenda dependendo de quantas linhas de referência existem
+    extra_legend_items = sum([1 for item in (dolos_avg, jplag_avg) if item is not None])
+    legend_cols = max(1, len(selected_algorithms) + extra_legend_items)
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.16), ncol=legend_cols)
+    
     fig.tight_layout()
     fig.savefig(output_path, dpi=150, bbox_inches="tight")
     plt.close(fig)
@@ -333,7 +403,7 @@ def create_block_plot(
         y_values = []
         for block_key in block_keys:
             block = file_record["block_map"][block_key]["algorithms"].get(algorithm_id)
-            y_values.append((block["similarity"] * 100) if block else 0.0)
+            y_values.append((block["similarity"]) if block else 0.0)
 
         offsets = [x + (index - (len(selected_algorithms) - 1) / 2) * width for x in x_positions]
         ax.bar(
@@ -389,6 +459,8 @@ def main() -> None:
     selected_algorithms = select_algorithms(dataset, args.algorithms)
     output_dir = Path(args.output_dir).resolve()
     ensure_output_dir(output_dir)
+    
+    reference_csv_path = Path(args.reference_csv).resolve() if args.reference_csv else None
 
     created_files: list[str] = []
     problem_value = args.problem
@@ -401,6 +473,7 @@ def main() -> None:
             selected_algorithms=selected_algorithms,
             problem_filter=problem_value,
             output_path=summary_path,
+            reference_csv=reference_csv_path,
         )
         created_files.append(summary_name)
 

@@ -1,0 +1,332 @@
+--- source_1.c	44:5
++++ source_1.c	47:5
+@@ -44,2 +47,1 @@ 99.97%
+-    for (int i = n / 2 - 1; i >= 0; i--) {
+-        heapificar(arr, n, i);
++    for(int i = n / 2 - 1; i >= 0; i--) heapify(arr, n, i);
+
+--- source_1.c	47:5
++++ source_1.c	48:5
+@@ -47,3 +48,3 @@ 99.90%
+-    for (int i = n - 1; i > 0; i--) {
+-        swap(&arr[0], &arr[i]);
+-        heapificar(arr, i, 0);
++    for(int i = n - 1; i > 0; i--) {
++        exchange(&arr[0], &arr[i]);
++        heapify(arr, i, 0);
+
+--- source_1.c	37:5
++++ source_1.c	40:5
+@@ -37,3 +40,3 @@ 99.86%
+-    if (smallest != i) {
+-        swap(&arr[i], &arr[smallest]);
+-        heapificar(arr, n, smallest);
++    if(smallest != i) {
++        exchange(&arr[i], &arr[smallest]);
++        heapify(arr, n, smallest);
+
+--- source_1.c	30:5
++++ source_1.c	38:5
+@@ -30,2 +38,1 @@ 99.14%
+-    if (l < n && arr[l].priority < arr[smallest].priority) {
+-        smallest = l;
++    if(l < n && arr[l].precedence < arr[smallest].precedence) smallest = l;
+
+--- source_1.c	33:5
++++ source_1.c	39:5
+@@ -33,2 +39,1 @@ 99.05%
+-    if (r < n && arr[r].priority < arr[smallest].priority) {
+-        smallest = r;
++    if(r < n && arr[r].precedence < arr[smallest].precedence) smallest = r;
+
+--- source_1.c	74:1
++++ source_1.c	60:1
+@@ -74,7 +60,4 @@ 98.94%
+ int main(int argc, char *argv[]) {
+-
+     char *input_filename = argv[1];
+     char *output_filename = argv[2];
+-
+-    // Abertura dos Arquivos
+-    FILE *infile = fopen(input_filename, "r");
++    FILE *input = fopen(input_filename, "r");
+
+--- source_1.c	25:1
++++ source_1.c	34:1
+@@ -25,4 +34,4 @@ 98.33%
+-void heapificar(Packet arr[], int n, int i) {
++void heapify(PACKAGE arr[], int n, int i) {
+     int smallest = i;
+     int l = 2 * i + 1;
+     int r = 2 * i + 2;
+
+--- source_1.c	60:9
++++ source_1.c	22:13
+@@ -60,2 +22,2 @@ 94.20%
+-        for (int j = 0; j < buffer[i].size; j++) {
+-            fprintf(fp, "%s", buffer[i].data[j]);
++            for(int j = 0; j < buffer[i].length; j++) {
++                fprintf(file, "%s", buffer[i].storage[j]);
+
+--- source_1.c	86:5
++++ source_1.c	68:5
+@@ -86,1 +68,1 @@ 93.12%
+-    FILE *outfile = fopen(output_filename, "w");
++    FILE *output = fopen(output_filename, "w");
+
+--- source_1.c	19:1
++++ source_1.c	54:1
+@@ -19,4 +54,4 @@ 91.11%
+-void swap(Packet *a, Packet *b) {
+-    Packet temp = *a;
++void exchange(PACKAGE *a, PACKAGE *b) {
++    PACKAGE auxiliar = *a;
+     *a = *b;
+-    *b = temp;
++    *b = auxiliar;
+
+--- source_1.c	43:1
++++ source_1.c	46:1
+@@ -43,1 +46,1 @@ 87.69%
+-void heapsort(Packet arr[], int n) {
++void heapsort(PACKAGE arr[], int n) {
+
+--- source_1.c	123:9
++++ source_1.c	96:9
+@@ -123,1 +96,1 @@ 87.57%
+-        for (int j = 0; j < novo_pac.size; j++) {
++        for(int j = 0; j < current_package.length; j++) {
+
+--- source_1.c	124:13
++++ source_1.c	97:13
+@@ -124,3 +97,3 @@ 86.39%
+-            if (fscanf(infile, "%s", novo_pac.data[j]) != 1) {
++            if(fscanf(input, "%s", current_package.storage[j]) != 1) {
+                 fprintf(stderr, "Erro: Falha ao ler dados do pacote %d.\n", i + 1);
+                 break;
+
+--- source_1.c	81:5
++++ source_1.c	64:5
+@@ -81,3 +64,3 @@ 85.34%
+-    if (infile == NULL) {
+-        perror("Erro na abertura do arquivo de entrada");
++    if(input == NULL) {
++        perror("INPUT OPEN ERROR\n");
+         return 1;
+
+--- source_1.c	58:5
++++ source_1.c	20:9
+@@ -58,2 +20,2 @@ 84.68%
+-    for (int i = 0; i < contador_buf; i++) {
+-        fprintf(fp, "|");
++        for(int i = 0; i < buffer_index; i++) {
++            fprintf(file, "|");
+
+--- source_1.c	62:13
++++ source_1.c	24:17
+@@ -62,2 +24,2 @@ 83.99%
+-            if (j < buffer[i].size - 1) {
+-                fprintf(fp, ",");
++                if(j < buffer[i].length - 1) {
++                    fprintf(file, ",");
+
+--- source_1.c	115:5
++++ source_1.c	90:5
+@@ -115,2 +90,2 @@ 77.20%
+-    for (int i = 0; i < n_packets; i++) {
+-        Packet novo_pac;
++    for(int i = 0; i < number_of_packets; i++) {
++        PACKAGE current_package;
+
+--- source_1.c	55:5
++++ source_1.c	123:5
+@@ -55,1 +123,1 @@ 73.92%
+-    if (contador_buf == 0) return;
++    return 0;
+
+--- source_1.c	87:5
++++ source_1.c	69:5
+@@ -87,4 +69,4 @@ 71.97%
+-    if (outfile == NULL) {
+-        perror("Erro na abertura do arquivo de saida");
+-        fclose(infile);
++    if(output == NULL) {
++        perror("OUTPUT OPEN ERROR\n");
++        fclose(input);
+         return 1;
+
+--- source_1.c	54:1
++++ source_1.c	17:1
+@@ -54,1 +17,1 @@ 66.99%
+-void write_buffer(FILE *fp, Packet buffer[], int contador_buf) {
++void write_buffer(FILE *file, PACKAGE buffer[], int buffer_index) {
+
+--- source_1.c	66:9
++++ source_1.c	28:13
+@@ -66,1 +28,1 @@ 65.92%
+-        fprintf(fp, "|");
++            fprintf(file, "|");
+
+--- source_1.c	94:5
++++ source_1.c	78:5
+@@ -94,5 +78,5 @@ 65.71%
+-    if (fscanf(infile, "%d %d\n", &n_packets, &bytes_maximos) != 2) {
+-        fprintf(stderr, "Formato de cabecalho invalido no arquivo de entrada.\n");
+-        fclose(infile);
+-        fclose(outfile);
++    if(fscanf(input, "%d %d\n", &number_of_packets, &max_number_bytes) != 2) {
++        fprintf(stderr, "INPUT LOAD ERROR\n");
++        fclose(input);
++        fclose(output);
+         return 1;
+
+--- source_1.c	118:9
++++ source_1.c	92:9
+@@ -118,3 +92,3 @@ 61.46%
+-        if (fscanf(infile, "%d %d", &novo_pac.priority, &novo_pac.size) != 2) {
+-            fprintf(stderr, "Erro: Formato invalido para o pacote %d.\n", i + 1);
++        if(fscanf(input, "%d %d", &current_package.precedence, &current_package.length) != 2) {
++            fprintf(stderr, "INVALID PACKAGE FORMAT %d\n", i + 1);
+             break; 
+
+--- source_1.c	1:1
++++ source_1.c	1:1
+@@ -1,16 +1,15 @@ 58.76%
+ #include <stdio.h>
+ 
+-// Constantes
+-#define MAXIMO 512
+-#define MAX_BYTE 3
+-// Limite maximo que o programa suporta
+-#define TOTAL_PACOTES 40000
++#define TOTAL_PACKAGES 40000
++#define MAXIMUM_BYTE 3
++#define MAXIMUM 512
+ 
+-/**
+- *  Struct
+- */
+ typedef struct {
+-    int priority;
+-    int size;
+-    char data[MAXIMO][MAX_BYTE];
+-} Packet;
++    char storage[MAXIMUM][MAXIMUM_BYTE];
++    int length;
++    int precedence;
++} PACKAGE;
++
++void exchange(PACKAGE *a, PACKAGE *b);
++void heapify(PACKAGE arr[], int n, int i);
++void heapsort(PACKAGE arr[], int n);
+
+--- source_1.c	56:5
++++ source_1.c	18:5
+@@ -56,1 +18,2 @@ 51.07%
+-    heapsort(buffer, contador_buf);
++    if(buffer_index != 0) {
++        heapsort(buffer, buffer_index);
+
+--- source_1.c	104:5
++++ source_1.c	84:5
+@@ -104,6 +84,5 @@ 40.89%
+-    if (n_packets > TOTAL_PACOTES) {
+-        fprintf(stderr, "Erro: O numero de pacotes (%d) excede o limite maximo do programa (%d).\n",
+-                n_packets, TOTAL_PACOTES);
+-        fclose(infile);
+-        fclose(outfile);
++    if(number_of_packets > TOTAL_PACKAGES) {
++        fprintf(stderr, "#PACKAGES (%d) EXCEEDS LIMIT (%d)\n", number_of_packets, TOTAL_PACKAGES);
++        fclose(input);
++        fclose(output);
+         return 1;
+
+--- source_1.c	112:5
++++ source_1.c	113:13
+@@ -112,2 +113,4 @@ 39.67%
+-    int contador_buf = 0;
+-    int bytes_atuais = 0;
++            if(current_bytes == max_number_bytes) {
++                write_buffer(output, buffer, buffer_index);  
++                buffer_index = 0;
++                current_bytes = 0;
+
+--- source_1.c	68:5
++++ source_1.c	30:9
+@@ -68,1 +30,1 @@ 29.79%
+-    fprintf(fp, "\n");
++        fprintf(file, "\n");
+
+--- source_1.c	137:9
++++ source_1.c	109:9
+@@ -137,4 +109,4 @@ 27.92%
+-        } else {
+-            buffer[contador_buf] = novo_pac;
+-            contador_buf++;
+-            bytes_atuais += novo_pac.size;
++        else {
++            buffer[buffer_index] = current_package;
++            buffer_index++;
++            current_bytes += current_package.length;
+
+--- source_1.c	130:9
++++ source_1.c	120:5
+@@ -130,6 +120,1 @@ 22.76%
+-        if (bytes_atuais + novo_pac.size > bytes_maximos) {
+-            write_buffer(outfile, buffer, contador_buf);
+-            
+-            buffer[0] = novo_pac;
+-            contador_buf = 1;
+-            bytes_atuais = novo_pac.size;
++    if(buffer_index > 0) write_buffer(output, buffer, buffer_index);
+
+--- source_1.c	93:5
++++ source_1.c	74:5
+@@ -93,1 +74,4 @@ 14.83%
+-    int n_packets, bytes_maximos;
++    int number_of_packets, max_number_bytes;
++    int buffer_index = 0;
++    int current_bytes = 0;
++    static PACKAGE buffer[TOTAL_PACKAGES];
+
+--- source_1.c	102:5
++++ source_1.c	102:9
+@@ -102,1 +102,5 @@ 12.61%
+-    static Packet buffer[TOTAL_PACOTES];
++        if(current_bytes + current_package.length > max_number_bytes) {
++            write_buffer(output, buffer, buffer_index);
++            buffer[0] = current_package;
++            buffer_index = 1;
++            current_bytes = current_package.length;
+
+--- source_1.c	142:13
++++ source_1.c	121:5
+@@ -142,5 +121,1 @@ 1.78%
+-            if (bytes_atuais == bytes_maximos) {
+-                write_buffer(outfile, buffer, contador_buf);
+-                
+-                contador_buf = 0;
+-                bytes_atuais = 0;
++    fclose(input);
+
+--- source_1.c	152:5
++++ source_1.c	122:5
+@@ -152,2 +122,1 @@ 1.76%
+-    if (contador_buf > 0) {
+-        write_buffer(outfile, buffer, contador_buf);
++    fclose(output);
+
+--- source_1.c	157:5
++++ Inexistente	0:1
+@@ -157,1 +0,1 @@ 0.00%
+-    fclose(infile);
+
+--- source_1.c	158:5
++++ Inexistente	0:1
+@@ -158,1 +0,1 @@ 0.00%
+-    fclose(outfile);
+
+--- source_1.c	160:5
++++ Inexistente	0:1
+@@ -160,1 +0,1 @@ 0.00%
+-    return 0;

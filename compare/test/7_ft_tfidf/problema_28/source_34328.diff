@@ -1,0 +1,158 @@
+--- /home/willyspada/github/cpp-parser/compare/test/source/original/problema_28/source_34328.c
++++ /home/willyspada/github/cpp-parser/compare/test/source/obfuscated/problema_28/source_34328.c
+@@ -1,1 +2,2 @@ 99.99%
+ #include <stdio.h>
++#include <stdint.h>
+@@ -1,1 +4,1 @@ 0.00%
++int main(){
+@@ -1,1 +6,7 @@ 0.00%
++  do {
++    unsigned int __jk_1704084_a = 0xDEADBEEFU;
++    unsigned int __jk_1704084_b = 0x12345678U;
++    __jk_1704084_a ^= (__jk_1704084_b >> 7);
++    __jk_1704084_a &= (__jk_1704084_b << 3);
++    __jk_1704084_b |= (~__jk_1704084_a >> 2);
++    __jk_1704084_a = (__jk_1704084_a + __jk_1704084_b) ^ 0xAAAAAAAAU;
+@@ -7,9 +44,5 @@ 99.76%
+-int main(){
+-
+-    int n, sta = 0, res = 0;
+-
+-    int a[102];
+-
+-    scanf("%d", &n);
+-
+-    int i;
++ReplacementFor_ReplacementFor___jk_1704084_a;(void)ReplacementFor_ReplacementFor___jk_1704084_b;}while((7408+(0x297+502-0x2a0)-(0x21e5+3907-0x124b)));int ReplacementFor_ReplacementFor_ReplacementFor_n
++,ReplacementFor_ReplacementFor_ReplacementFor_sta=(((0x229a+3236-0x22fd)+7368-9345)+((0x26ec+3901-0x2534)+(0x1192+933-0xc25)-(0x159c+2604-0x137c))-((0x15a1+5174-0x14c8)+(0x1a84+271-0x17ea)-
++(0x1dcb+950-0x1b0c))),res=(((0x110a+670-0x3c7)+(0x17db+5263-0x22dd)-(0x1a31+4260-0x1f70))+((0x2304+2810-0x13af)+(0x15e3+4251-0x2129)-(0x2385+1352-0x1ebf))-9119);int 
++ReplacementFor_ReplacementFor_ReplacementFor_a[((8571+(0x19db+214-0x132e)-(0x131a+2405-0xec6))+((0x1806+702-0xdd8)+(0x104c+5309-0x157f)-(0x231b+143-0x10a3))-9294)];scanf("\x25\x64",&
++ReplacementFor_ReplacementFor_ReplacementFor_n);int ReplacementFor_ReplacementFor_ReplacementFor_i;for(ReplacementFor_ReplacementFor_ReplacementFor_i=((0x22f8+5086-0x1a6c)+(3877+7676-9991)-8835);
+@@ -1,1 +13,2 @@ 0.00%
++    if (((__jk_1704084_a ^ __jk_1704084_b) & 0x1U) == 0x2U) {
++      __jk_1704084_a += 0x100U;
+@@ -1,1 +16,1 @@ 0.00%
++    (void)__jk_1704084_a;
+@@ -1,1 +17,1 @@ 0.00%
++    (void)__jk_1704084_b;
+@@ -17,3 +48,3 @@ 100.00%
+-    for (i = 1; i <= n; i++)
+-
+-        scanf("%d", &a[i]);
++ReplacementFor_ReplacementFor_ReplacementFor_n);int ReplacementFor_ReplacementFor_ReplacementFor_i;for(ReplacementFor_ReplacementFor_ReplacementFor_i=((0x22f8+5086-0x1a6c)+(3877+7676-9991)-8835);
++ReplacementFor_ReplacementFor_ReplacementFor_i<=ReplacementFor_ReplacementFor_ReplacementFor_n;ReplacementFor_ReplacementFor_ReplacementFor_i++)scanf("\x25\x64",&
++ReplacementFor_ReplacementFor_ReplacementFor_a[ReplacementFor_ReplacementFor_ReplacementFor_i]);ReplacementFor_ReplacementFor_ReplacementFor_a[ReplacementFor_ReplacementFor_ReplacementFor_n+((4929+
+@@ -1,1 +19,1 @@ 0.00%
++do{
+@@ -1,1 +21,5 @@ 0.00%
++  do {
++    char __jk_96480236_a[] = "deadlock_avoid";
++    uintptr_t __jk_96480236_b = (uintptr_t)__jk_96480236_a;
++    uintptr_t __jk_96480236_c = __jk_96480236_b + sizeof(__jk_96480236_a);
++    __jk_96480236_b = (__jk_96480236_b ^ __jk_96480236_c) >> 1;
+@@ -21,1 +50,2 @@ 99.90%
+-    a[n+1] = 0;
++ReplacementFor_ReplacementFor_ReplacementFor_a[ReplacementFor_ReplacementFor_ReplacementFor_i]);ReplacementFor_ReplacementFor_ReplacementFor_a[ReplacementFor_ReplacementFor_ReplacementFor_n+((4929+
++6304-7993)+(2842+(0x1d86+2891-0x13a4)-(0x1b65+1051-0x59c))-(0x1334+4640-0x124a))]=(((0x1734+5121-0x1fb4)+6833-7873)+(9122+(0x181c+3077-0x224a)-(0x2535+6560-0x25d8))-(9855+3158-(0x21b3+3729-0x115c)));
+@@ -23,1 +52,2 @@ 100.00%
+-    for (i = 1; i <= n; i++)
++for(ReplacementFor_ReplacementFor_ReplacementFor_i=(((0x21c0+3165-0x1246)+(0x1bf8+5388-0x15ac)-(0x22d8+8248-0x225e))+((0x168a+8933-0x23be)+(0x2268+5799-0x24fa)-8473)-(0x2256+4401-0x145e));
++ReplacementFor_ReplacementFor_ReplacementFor_i<=ReplacementFor_ReplacementFor_ReplacementFor_n;ReplacementFor_ReplacementFor_ReplacementFor_i++){do{char ReplacementFor_ReplacementFor___jk_96480236_a[]
+@@ -1,1 +26,2 @@ 0.00%
++    if (__jk_96480236_b == 0x31415926UL) {
++      __jk_96480236_c += 1;
+@@ -27,1 +58,2 @@ 100.00%
+-        if (sta == 0)
++}while(((0xc54+7570-0x2100)+(0x1a40+6238-0x2571)-(0x1925+7603-0x20c5)));if(ReplacementFor_ReplacementFor_ReplacementFor_sta==(((0x22f7+5221-0x1e4f)+(0x7ff+7684-0x245c)-(0x160b+963-0x65a))+4457-
++(0x1b5f+5396-0x17ca)))if(ReplacementFor_ReplacementFor_ReplacementFor_a[ReplacementFor_ReplacementFor_ReplacementFor_i]==(((0x196c+6026-0x18da)+(0x1f06+3504-0x26ca)-(0x2341+6906-0x24f5))+
+@@ -1,1 +29,1 @@ 0.00%
++    (void)__jk_96480236_b;
+@@ -29,1 +59,3 @@ 100.00%
+-            if (a[i] == 1) sta = 1;
++(0x1b5f+5396-0x17ca)))if(ReplacementFor_ReplacementFor_ReplacementFor_a[ReplacementFor_ReplacementFor_ReplacementFor_i]==(((0x196c+6026-0x18da)+(0x1f06+3504-0x26ca)-(0x2341+6906-0x24f5))+
++(0x9b3+8708-0x2448)-((0x215a+1674-0x1581)+8219-9806)))ReplacementFor_ReplacementFor_ReplacementFor_sta=(((0x1f1f+4825-0x1943)+(0x1f1a+5697-0x1fb8)-9968)+((0x1d29+2941-0x1cd0)+4696-5928)-(
++(0x1957+5771-0x1de8)+(0x1365+3279-0xe9f)-5410));if(ReplacementFor_ReplacementFor_ReplacementFor_sta==((7783+(0xa4c+7413-0x245d)-5290)+((0x2219+2296-0x9a8)+(0x1d88+5690-0x1cd5)-8744)-(9869+
+@@ -1,1 +30,1 @@ 0.00%
++    (void)__jk_96480236_c;
+@@ -1,1 +31,1 @@ 0.00%
++  } while (0);
+@@ -31,1 +61,2 @@ 100.00%
+-        if (sta == 1)
++(0x1957+5771-0x1de8)+(0x1365+3279-0xe9f)-5410));if(ReplacementFor_ReplacementFor_ReplacementFor_sta==((7783+(0xa4c+7413-0x245d)-5290)+((0x2219+2296-0x9a8)+(0x1d88+5690-0x1cd5)-8744)-(9869+
++(0xb11+7480-0x26a7)-(0x1c15+561-0x18e5))))if(ReplacementFor_ReplacementFor_ReplacementFor_a[ReplacementFor_ReplacementFor_ReplacementFor_i]==(((0x1ca8+3375-0x1296)+6740-(0x209f+2510-0xaff))+(6747+
+@@ -1,1 +32,3 @@ 0.00%
++unsigned int ReplacementFor___jk_1704084_a=0xDEADBEEFU;unsigned int ReplacementFor___jk_1704084_b=0x12345678U;ReplacementFor___jk_1704084_a^=(ReplacementFor___jk_1704084_b>>
++(0x21d+5556-0x17ca));ReplacementFor___jk_1704084_a&=(ReplacementFor___jk_1704084_b<<(0x2024+1267-0x2514));ReplacementFor___jk_1704084_b|=(~ReplacementFor___jk_1704084_a>>(0x1317+1416-0x189d));
++ReplacementFor___jk_1704084_a=(ReplacementFor___jk_1704084_a+ReplacementFor___jk_1704084_b)^0xAAAAAAAAU;if(((ReplacementFor___jk_1704084_a^ReplacementFor___jk_1704084_b)&0x1U)==0x2U){
+@@ -33,1 +62,5 @@ 100.00%
+-            if (a[i] == 0 && a[i+1] == 0) sta = 0;
++(0xb11+7480-0x26a7)-(0x1c15+561-0x18e5))))if(ReplacementFor_ReplacementFor_ReplacementFor_a[ReplacementFor_ReplacementFor_ReplacementFor_i]==(((0x1ca8+3375-0x1296)+6740-(0x209f+2510-0xaff))+(6747+
++(0x2246+1814-0x20db)-8866)-((0x235b+2651-0xd03)+(0xc10+5020-0x1860)-(0x20ad+4499-0x1ca2)))&&ReplacementFor_ReplacementFor_ReplacementFor_a[ReplacementFor_ReplacementFor_ReplacementFor_i+((
++(0xf93+7478-0x1f28)+(0x1d09+4488-0x22a2)-5088)+((0x194f+194-0x11a)+7459-7923)-(0x1d36+1633-0x6c1))]==(((0x11e5+5347-0x19bc)+(0x126b+2313-0x1300)-(0x1931+4546-0x15cf))+((0x1ce3+3495-0x1582)+8415-9915)-
++((0x22e6+5604-0x1c94)+(0x255a+2517-0x236f)-(0x1bac+7372-0x200a))))ReplacementFor_ReplacementFor_ReplacementFor_sta=(7946+((0x1d69+3417-0x1dfe)+(0x101d+374-0x86b)-(0x2645+14-0x107a))-
++(0x22c4+3662-0x11f5));if(ReplacementFor_ReplacementFor_ReplacementFor_sta==(((0x175a+460-0x1136)+8388-(0x2358+991-0x642))+((0xf78+3469-0x1409)+(0x150d+6673-0x225b)-4483)-(6719+(0xfb1+579-0xa81)-
+@@ -1,1 +34,2 @@ 0.00%
++ReplacementFor___jk_1704084_a=(ReplacementFor___jk_1704084_a+ReplacementFor___jk_1704084_b)^0xAAAAAAAAU;if(((ReplacementFor___jk_1704084_a^ReplacementFor___jk_1704084_b)&0x1U)==0x2U){
++ReplacementFor___jk_1704084_a+=0x100U;}(void)ReplacementFor___jk_1704084_a;(void)ReplacementFor___jk_1704084_b;}while((0x1f6+3339-0xf01));do{do{char ReplacementFor___jk_96480236_a[]=
+@@ -1,1 +35,1 @@ 0.00%
++ReplacementFor___jk_1704084_a+=0x100U;}(void)ReplacementFor___jk_1704084_a;(void)ReplacementFor___jk_1704084_b;}while((0x1f6+3339-0xf01));do{do{char ReplacementFor___jk_96480236_a[]=
+@@ -1,1 +35,1 @@ 0.00%
++ReplacementFor___jk_1704084_a+=0x100U;}(void)ReplacementFor___jk_1704084_a;(void)ReplacementFor___jk_1704084_b;}while((0x1f6+3339-0xf01));do{do{char ReplacementFor___jk_96480236_a[]=
+@@ -1,1 +35,1 @@ 0.00%
++ReplacementFor___jk_1704084_a+=0x100U;}(void)ReplacementFor___jk_1704084_a;(void)ReplacementFor___jk_1704084_b;}while((0x1f6+3339-0xf01));do{do{char ReplacementFor___jk_96480236_a[]=
+@@ -1,1 +35,1 @@ 0.00%
++ReplacementFor___jk_1704084_a+=0x100U;}(void)ReplacementFor___jk_1704084_a;(void)ReplacementFor___jk_1704084_b;}while((0x1f6+3339-0xf01));do{do{char ReplacementFor___jk_96480236_a[]=
+@@ -1,1 +35,3 @@ 0.00%
++ReplacementFor___jk_1704084_a+=0x100U;}(void)ReplacementFor___jk_1704084_a;(void)ReplacementFor___jk_1704084_b;}while((0x1f6+3339-0xf01));do{do{char ReplacementFor___jk_96480236_a[]=
++"\x64\x65\x61\x64\x6c\x6f\x63\x6b\x5f\x61\x76\x6f\x69\x64";uintptr_t ReplacementFor___jk_96480236_b=(uintptr_t)ReplacementFor___jk_96480236_a;uintptr_t ReplacementFor___jk_96480236_c=
++ReplacementFor___jk_96480236_b+sizeof(ReplacementFor___jk_96480236_a);ReplacementFor___jk_96480236_b=(ReplacementFor___jk_96480236_b^ReplacementFor___jk_96480236_c)>>(0x1d0+7290-0x1e49);if(
+@@ -35,1 +66,2 @@ 100.00%
+-        if (sta == 1) res++;
++(0x22c4+3662-0x11f5));if(ReplacementFor_ReplacementFor_ReplacementFor_sta==(((0x175a+460-0x1136)+8388-(0x2358+991-0x642))+((0xf78+3469-0x1409)+(0x150d+6673-0x225b)-4483)-(6719+(0xfb1+579-0xa81)-
++(0x1cec+2054-0xf3a))))res++;}printf("\x25\x64",res);return(((0x21e8+2902-0x1225)+(0x155f+6523-0x1cb7)-7803)+((0x1d7d+7346-0x213a)+4605-7611)-(0x214b+7240-0x219b));}
+@@ -1,1 +37,2 @@ 0.00%
++ReplacementFor___jk_96480236_b+sizeof(ReplacementFor___jk_96480236_a);ReplacementFor___jk_96480236_b=(ReplacementFor___jk_96480236_b^ReplacementFor___jk_96480236_c)>>(0x1d0+7290-0x1e49);if(
++ReplacementFor___jk_96480236_b==0x31415926UL){ReplacementFor___jk_96480236_c+=(0x1a02+1495-0x1fd8);}(void)ReplacementFor___jk_96480236_b;(void)ReplacementFor___jk_96480236_c;}while((0xdc4+6137-0x25bd)
+@@ -1,1 +38,1 @@ 0.00%
++ReplacementFor___jk_96480236_b==0x31415926UL){ReplacementFor___jk_96480236_c+=(0x1a02+1495-0x1fd8);}(void)ReplacementFor___jk_96480236_b;(void)ReplacementFor___jk_96480236_c;}while((0xdc4+6137-0x25bd)
+@@ -1,1 +38,1 @@ 0.00%
++ReplacementFor___jk_96480236_b==0x31415926UL){ReplacementFor___jk_96480236_c+=(0x1a02+1495-0x1fd8);}(void)ReplacementFor___jk_96480236_b;(void)ReplacementFor___jk_96480236_c;}while((0xdc4+6137-0x25bd)
+@@ -1,1 +38,1 @@ 0.00%
++ReplacementFor___jk_96480236_b==0x31415926UL){ReplacementFor___jk_96480236_c+=(0x1a02+1495-0x1fd8);}(void)ReplacementFor___jk_96480236_b;(void)ReplacementFor___jk_96480236_c;}while((0xdc4+6137-0x25bd)
+@@ -1,1 +39,4 @@ 0.00%
++);unsigned int ReplacementFor_ReplacementFor___jk_1704084_a=0xDEADBEEFU;unsigned int ReplacementFor_ReplacementFor___jk_1704084_b=0x12345678U;ReplacementFor_ReplacementFor___jk_1704084_a^=(
++ReplacementFor_ReplacementFor___jk_1704084_b>>((0xda6+5745-0x1f7a)+(0x1211+2508-0x9fb)-(0x2081+755-0xcfc)));ReplacementFor_ReplacementFor___jk_1704084_a&=(ReplacementFor_ReplacementFor___jk_1704084_b
++<<((0x184f+5092-0x2571)+(0x12a2+5692-0x1dc7)-4566));ReplacementFor_ReplacementFor___jk_1704084_b|=(~ReplacementFor_ReplacementFor___jk_1704084_a>>((0x7b2+2378-0xd74)+(0x1335+1299-0x16be)-
++(0x165a+2857-0x1c73)));ReplacementFor_ReplacementFor___jk_1704084_a=(ReplacementFor_ReplacementFor___jk_1704084_a+ReplacementFor_ReplacementFor___jk_1704084_b)^0xAAAAAAAAU;if(((
+@@ -41,1 +67,1 @@ 99.10%
+-    printf("%d", res);
++(0x1cec+2054-0xf3a))))res++;}printf("\x25\x64",res);return(((0x21e8+2902-0x1225)+(0x155f+6523-0x1cb7)-7803)+((0x1d7d+7346-0x213a)+4605-7611)-(0x214b+7240-0x219b));}
+@@ -1,1 +42,2 @@ 0.00%
++(0x165a+2857-0x1c73)));ReplacementFor_ReplacementFor___jk_1704084_a=(ReplacementFor_ReplacementFor___jk_1704084_a+ReplacementFor_ReplacementFor___jk_1704084_b)^0xAAAAAAAAU;if(((
++ReplacementFor_ReplacementFor___jk_1704084_a^ReplacementFor_ReplacementFor___jk_1704084_b)&0x1U)==0x2U){ReplacementFor_ReplacementFor___jk_1704084_a+=0x100U;}(void)
+@@ -43,1 +18,1 @@ 99.94%
+-    return 0;
++  } while (0);
+@@ -1,1 +43,2 @@ 0.00%
++ReplacementFor_ReplacementFor___jk_1704084_a^ReplacementFor_ReplacementFor___jk_1704084_b)&0x1U)==0x2U){ReplacementFor_ReplacementFor___jk_1704084_a+=0x100U;}(void)
++ReplacementFor_ReplacementFor___jk_1704084_a;(void)ReplacementFor_ReplacementFor___jk_1704084_b;}while((7408+(0x297+502-0x2a0)-(0x21e5+3907-0x124b)));int ReplacementFor_ReplacementFor_ReplacementFor_n
+@@ -1,1 +44,1 @@ 0.00%
++ReplacementFor_ReplacementFor___jk_1704084_a;(void)ReplacementFor_ReplacementFor___jk_1704084_b;}while((7408+(0x297+502-0x2a0)-(0x21e5+3907-0x124b)));int ReplacementFor_ReplacementFor_ReplacementFor_n
+@@ -1,1 +44,1 @@ 0.00%
++ReplacementFor_ReplacementFor___jk_1704084_a;(void)ReplacementFor_ReplacementFor___jk_1704084_b;}while((7408+(0x297+502-0x2a0)-(0x21e5+3907-0x124b)));int ReplacementFor_ReplacementFor_ReplacementFor_n
+@@ -1,1 +53,4 @@ 0.00%
++ReplacementFor_ReplacementFor_ReplacementFor_i<=ReplacementFor_ReplacementFor_ReplacementFor_n;ReplacementFor_ReplacementFor_ReplacementFor_i++){do{char ReplacementFor_ReplacementFor___jk_96480236_a[]
++="\x64\x65\x61\x64\x6c\x6f\x63\x6b\x5f\x61\x76\x6f\x69\x64";uintptr_t ReplacementFor_ReplacementFor___jk_96480236_b=(uintptr_t)ReplacementFor_ReplacementFor___jk_96480236_a;uintptr_t 
++ReplacementFor_ReplacementFor___jk_96480236_c=ReplacementFor_ReplacementFor___jk_96480236_b+sizeof(ReplacementFor_ReplacementFor___jk_96480236_a);ReplacementFor_ReplacementFor___jk_96480236_b=(
++ReplacementFor_ReplacementFor___jk_96480236_b^ReplacementFor_ReplacementFor___jk_96480236_c)>>((0x19ad+429-0x18e4)+7722-8351);if(ReplacementFor_ReplacementFor___jk_96480236_b==0x31415926UL){
+@@ -1,1 +56,2 @@ 0.00%
++ReplacementFor_ReplacementFor___jk_96480236_b^ReplacementFor_ReplacementFor___jk_96480236_c)>>((0x19ad+429-0x18e4)+7722-8351);if(ReplacementFor_ReplacementFor___jk_96480236_b==0x31415926UL){
++ReplacementFor_ReplacementFor___jk_96480236_c+=((0xd87+1948-0x13c4)+5081-(0x193d+8138-0x23d0));}(void)ReplacementFor_ReplacementFor___jk_96480236_b;(void)ReplacementFor_ReplacementFor___jk_96480236_c;
+@@ -1,1 +57,1 @@ 0.00%
++ReplacementFor_ReplacementFor___jk_96480236_c+=((0xd87+1948-0x13c4)+5081-(0x193d+8138-0x23d0));}(void)ReplacementFor_ReplacementFor___jk_96480236_b;(void)ReplacementFor_ReplacementFor___jk_96480236_c;
+@@ -1,1 +57,1 @@ 0.00%
++ReplacementFor_ReplacementFor___jk_96480236_c+=((0xd87+1948-0x13c4)+5081-(0x193d+8138-0x23d0));}(void)ReplacementFor_ReplacementFor___jk_96480236_b;(void)ReplacementFor_ReplacementFor___jk_96480236_c;
+@@ -1,1 +58,1 @@ 0.00%
++}while(((0xc54+7570-0x2100)+(0x1a40+6238-0x2571)-(0x1925+7603-0x20c5)));if(ReplacementFor_ReplacementFor_ReplacementFor_sta==(((0x22f7+5221-0x1e4f)+(0x7ff+7684-0x245c)-(0x160b+963-0x65a))+4457-
+@@ -1,1 +67,1 @@ 0.00%
++(0x1cec+2054-0xf3a))))res++;}printf("\x25\x64",res);return(((0x21e8+2902-0x1225)+(0x155f+6523-0x1cb7)-7803)+((0x1d7d+7346-0x213a)+4605-7611)-(0x214b+7240-0x219b));}

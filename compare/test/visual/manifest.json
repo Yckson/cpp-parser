@@ -1,0 +1,19 @@
+{
+  "input_root": "/home/willyspada/github/cpp-parser/compare/test",
+  "problem": "problema_84",
+  "file": null,
+  "algorithms": [
+    "1_diff",
+    "2_bow",
+    "3_tfidf",
+    "4_svd",
+    "5_w2v",
+    "6_ft",
+    "7_ft_tfidf"
+  ],
+  "mode": "summary",
+  "plot_style": "line",
+  "created_files": [
+    "summary_problema_84.png"
+  ]
+}

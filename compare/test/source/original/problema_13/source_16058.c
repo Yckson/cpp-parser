@@ -1,0 +1,3 @@
+#include<stdio.h>
+int main (){int n,computer[1000],turn=0,count=0,change=0,quantity=0,i;scanf("%d",&n);for(i=0;i<n;i++)scanf("%d",&computer[i]);for(;;){if(turn%2==0){
+/*for(i=0;i<n;i++)quantity++;*/for(i=0;i<n;i++){if(quantity>=computer[i] && computer[i]>=0)quantity++,computer[i]=-1,count++;}turn++;}else{for(i=n-1;i>=0;i--){if(quantity>=computer[i] && computer[i]>=0)quantity++,computer[i]=-1,count++;}turn++;}if(count==n)break;else change++;}printf("%d\n",change);return 0;}

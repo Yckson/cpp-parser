@@ -3,3 +3,5 @@ tree-sitter-c>=0.20.0
 tree-sitter-cpp>=0.20.0
 scikit-learn
 matplotlib>=3.8.0
+numpy
+gensim

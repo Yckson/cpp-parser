@@ -376,19 +376,6 @@ def create_summary_plot(
                 label=series["label"],
                 color=colors(index % 10),
             )
-            # Adiciona a porcentagem logo acima dos pontos no gráfico de linhas
-            for x, y in zip(x_positions, series["values"]):
-                if y > 0:
-                    # Pequeno deslocamento lateral para não embolar várias anotações no mesmo X
-                    x_offset = (index - (num_series - 1) / 2) * 0.15 
-                    ax.annotate(
-                        f'{y:.2f}',
-                        xy=(x + x_offset, y),
-                        xytext=(0, 5),
-                        textcoords="offset points",
-                        ha='center', va='bottom',
-                        fontsize=7, rotation=90
-                    )
 
     ax.set_ylabel("Similaridade (%)")
     ax.set_xlabel("Arquivo")

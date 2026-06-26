@@ -1,0 +1,226 @@
+--- /home/willyspada/github/cpp-parser/compare/examples/original/source_1.c
++++ /home/willyspada/github/cpp-parser/compare/examples/plagio/source_1.c
+@@ -1,16 +1,15 @@ 67.37%
+ #include <stdio.h>
+ 
+-// Constantes
+-#define MAXIMO 512
+-#define MAX_BYTE 3
+-// Limite maximo que o programa suporta
+-#define TOTAL_PACOTES 40000
++#define TOTAL_PACKAGES 40000
++#define MAXIMUM_BYTE 3
++#define MAXIMUM 512
+ 
+-/**
+- *  Struct
+- */
+ typedef struct {
+-    int priority;
+-    int size;
+-    char data[MAXIMO][MAX_BYTE];
+-} Packet;
++    char storage[MAXIMUM][MAXIMUM_BYTE];
++    int length;
++    int precedence;
++} PACKAGE;
++
++void exchange(PACKAGE *a, PACKAGE *b);
++void heapify(PACKAGE arr[], int n, int i);
++void heapsort(PACKAGE arr[], int n);
+@@ -19,4 +54,4 @@ 98.34%
+-void swap(Packet *a, Packet *b) {
+-    Packet temp = *a;
++void exchange(PACKAGE *a, PACKAGE *b) {
++    PACKAGE auxiliar = *a;
+     *a = *b;
+-    *b = temp;
++    *b = auxiliar;
+@@ -25,4 +34,4 @@ 99.93%
+-void heapificar(Packet arr[], int n, int i) {
++void heapify(PACKAGE arr[], int n, int i) {
+     int smallest = i;
+     int l = 2 * i + 1;
+     int r = 2 * i + 2;
+@@ -30,2 +38,1 @@ 99.96%
+-    if (l < n && arr[l].priority < arr[smallest].priority) {
+-        smallest = l;
++    if(l < n && arr[l].precedence < arr[smallest].precedence) smallest = l;
+@@ -33,2 +39,1 @@ 99.96%
+-    if (r < n && arr[r].priority < arr[smallest].priority) {
+-        smallest = r;
++    if(r < n && arr[r].precedence < arr[smallest].precedence) smallest = r;
+@@ -37,3 +40,3 @@ 100.00%
+-    if (smallest != i) {
+-        swap(&arr[i], &arr[smallest]);
+-        heapificar(arr, n, smallest);
++    if(smallest != i) {
++        exchange(&arr[i], &arr[smallest]);
++        heapify(arr, n, smallest);
+@@ -43,1 +46,1 @@ 99.31%
+-void heapsort(Packet arr[], int n) {
++void heapsort(PACKAGE arr[], int n) {
+@@ -44,2 +47,1 @@ 100.00%
+-    for (int i = n / 2 - 1; i >= 0; i--) {
+-        heapificar(arr, n, i);
++    for(int i = n / 2 - 1; i >= 0; i--) heapify(arr, n, i);
+@@ -47,3 +48,3 @@ 100.00%
+-    for (int i = n - 1; i > 0; i--) {
+-        swap(&arr[0], &arr[i]);
+-        heapificar(arr, i, 0);
++    for(int i = n - 1; i > 0; i--) {
++        exchange(&arr[0], &arr[i]);
++        heapify(arr, i, 0);
+@@ -54,1 +17,1 @@ 75.06%
+-void write_buffer(FILE *fp, Packet buffer[], int contador_buf) {
++void write_buffer(FILE *file, PACKAGE buffer[], int buffer_index) {
+@@ -55,1 +123,1 @@ 71.38%
+-    if (contador_buf == 0) return;
++    return 0;
+@@ -56,1 +18,2 @@ 51.12%
+-    heapsort(buffer, contador_buf);
++    if(buffer_index != 0) {
++        heapsort(buffer, buffer_index);
+@@ -58,2 +20,2 @@ 89.12%
+-    for (int i = 0; i < contador_buf; i++) {
+-        fprintf(fp, "|");
++        for(int i = 0; i < buffer_index; i++) {
++            fprintf(file, "|");
+@@ -60,2 +22,2 @@ 98.92%
+-        for (int j = 0; j < buffer[i].size; j++) {
+-            fprintf(fp, "%s", buffer[i].data[j]);
++            for(int j = 0; j < buffer[i].length; j++) {
++                fprintf(file, "%s", buffer[i].storage[j]);
+@@ -62,2 +24,2 @@ 94.80%
+-            if (j < buffer[i].size - 1) {
+-                fprintf(fp, ",");
++                if(j < buffer[i].length - 1) {
++                    fprintf(file, ",");
+@@ -66,1 +28,1 @@ 94.66%
+-        fprintf(fp, "|");
++            fprintf(file, "|");
+@@ -68,1 +30,1 @@ 94.66%
+-    fprintf(fp, "\n");
++        fprintf(file, "\n");
+@@ -74,7 +60,4 @@ 99.92%
+ int main(int argc, char *argv[]) {
+-
+     char *input_filename = argv[1];
+     char *output_filename = argv[2];
+-
+-    // Abertura dos Arquivos
+-    FILE *infile = fopen(input_filename, "r");
++    FILE *input = fopen(input_filename, "r");
+@@ -81,3 +64,3 @@ 99.32%
+-    if (infile == NULL) {
+-        perror("Erro na abertura do arquivo de entrada");
++    if(input == NULL) {
++        perror("INPUT OPEN ERROR\n");
+         return 1;
+@@ -86,1 +68,1 @@ 94.81%
+-    FILE *outfile = fopen(output_filename, "w");
++    FILE *output = fopen(output_filename, "w");
+@@ -87,4 +69,4 @@ 96.50%
+-    if (outfile == NULL) {
+-        perror("Erro na abertura do arquivo de saida");
+-        fclose(infile);
++    if(output == NULL) {
++        perror("OUTPUT OPEN ERROR\n");
++        fclose(input);
+         return 1;
+@@ -93,1 +74,4 @@ 56.45%
+-    int n_packets, bytes_maximos;
++    int number_of_packets, max_number_bytes;
++    int buffer_index = 0;
++    int current_bytes = 0;
++    static PACKAGE buffer[TOTAL_PACKAGES];
+@@ -94,5 +78,5 @@ 94.76%
+-    if (fscanf(infile, "%d %d\n", &n_packets, &bytes_maximos) != 2) {
+-        fprintf(stderr, "Formato de cabecalho invalido no arquivo de entrada.\n");
+-        fclose(infile);
+-        fclose(outfile);
++    if(fscanf(input, "%d %d\n", &number_of_packets, &max_number_bytes) != 2) {
++        fprintf(stderr, "INPUT LOAD ERROR\n");
++        fclose(input);
++        fclose(output);
+         return 1;
+@@ -102,1 +120,1 @@ 77.86%
+-    static Packet buffer[TOTAL_PACOTES];
++    if(buffer_index > 0) write_buffer(output, buffer, buffer_index);
+@@ -104,6 +84,5 @@ 94.71%
+-    if (n_packets > TOTAL_PACOTES) {
+-        fprintf(stderr, "Erro: O numero de pacotes (%d) excede o limite maximo do programa (%d).\n",
+-                n_packets, TOTAL_PACOTES);
+-        fclose(infile);
+-        fclose(outfile);
++    if(number_of_packets > TOTAL_PACKAGES) {
++        fprintf(stderr, "#PACKAGES (%d) EXCEEDS LIMIT (%d)\n", number_of_packets, TOTAL_PACKAGES);
++        fclose(input);
++        fclose(output);
+         return 1;
+@@ -112,2 +90,2 @@ 14.80%
+-    int contador_buf = 0;
+-    int bytes_atuais = 0;
++    for(int i = 0; i < number_of_packets; i++) {
++        PACKAGE current_package;
+@@ -115,2 +97,3 @@ 41.48%
+-    for (int i = 0; i < n_packets; i++) {
+-        Packet novo_pac;
++            if(fscanf(input, "%s", current_package.storage[j]) != 1) {
++                fprintf(stderr, "Erro: Falha ao ler dados do pacote %d.\n", i + 1);
++                break;
+@@ -118,3 +92,3 @@ 67.24%
+-        if (fscanf(infile, "%d %d", &novo_pac.priority, &novo_pac.size) != 2) {
+-            fprintf(stderr, "Erro: Formato invalido para o pacote %d.\n", i + 1);
++        if(fscanf(input, "%d %d", &current_package.precedence, &current_package.length) != 2) {
++            fprintf(stderr, "INVALID PACKAGE FORMAT %d\n", i + 1);
+             break; 
+@@ -123,1 +96,1 @@ 94.92%
+-        for (int j = 0; j < novo_pac.size; j++) {
++        for(int j = 0; j < current_package.length; j++) {
+@@ -124,3 +121,1 @@ 35.53%
+-            if (fscanf(infile, "%s", novo_pac.data[j]) != 1) {
+-                fprintf(stderr, "Erro: Falha ao ler dados do pacote %d.\n", i + 1);
+-                break;
++    fclose(input);
+@@ -130,6 +113,4 @@ 15.12%
+-        if (bytes_atuais + novo_pac.size > bytes_maximos) {
+-            write_buffer(outfile, buffer, contador_buf);
+-            
+-            buffer[0] = novo_pac;
+-            contador_buf = 1;
+-            bytes_atuais = novo_pac.size;
++            if(current_bytes == max_number_bytes) {
++                write_buffer(output, buffer, buffer_index);  
++                buffer_index = 0;
++                current_bytes = 0;
+@@ -137,4 +102,5 @@ 3.73%
+-        } else {
+-            buffer[contador_buf] = novo_pac;
+-            contador_buf++;
+-            bytes_atuais += novo_pac.size;
++        if(current_bytes + current_package.length > max_number_bytes) {
++            write_buffer(output, buffer, buffer_index);
++            buffer[0] = current_package;
++            buffer_index = 1;
++            current_bytes = current_package.length;
+@@ -142,5 +109,4 @@ 5.51%
+-            if (bytes_atuais == bytes_maximos) {
+-                write_buffer(outfile, buffer, contador_buf);
+-                
+-                contador_buf = 0;
+-                bytes_atuais = 0;
++        else {
++            buffer[buffer_index] = current_package;
++            buffer_index++;
++            current_bytes += current_package.length;
+@@ -152,2 +122,1 @@ 3.19%
+-    if (contador_buf > 0) {
+-        write_buffer(outfile, buffer, contador_buf);
++    fclose(output);
+@@ -157,1 +1,1 @@ 0.00%
+-    fclose(infile);
+@@ -158,1 +1,1 @@ 0.00%
+-    fclose(outfile);
+@@ -160,1 +1,1 @@ 0.00%
+-    return 0;

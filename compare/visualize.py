@@ -12,6 +12,7 @@ Opções úteis:
   --algorithms 1_diff,3_tfidf
   --file problema_102/source_118431.json
   --mode summary|blocks|both
+  --plot-style bar|line
   --reference-csv results_jplag_dolos.csv
 """
 
@@ -74,9 +75,15 @@ def build_parser() -> argparse.ArgumentParser:
         help="Seleciona o tipo de visualização a gerar.",
     )
     parser.add_argument(
+        "--plot-style",
+        choices=("bar", "line"),
+        default="bar",
+        help="Estilo do gráfico de sumário (bar para barras, line para linhas com pontos). Padrão: bar",
+    )
+    parser.add_argument(
         "--reference-csv",
         default=None,
-        help="Arquivo CSV contendo resultados do Jplag e Dolos para adicionar a linha de média.",
+        help="Arquivo CSV contendo resultados do Jplag e Dolos para adicionar a comparação.",
     )
     return parser
 
@@ -256,6 +263,7 @@ def create_summary_plot(
     problem_filter: str,
     output_path: Path,
     reference_csv: Path | None = None,
+    plot_style: str = "bar",
 ) -> None:
     import matplotlib.pyplot as plt
 
@@ -281,98 +289,120 @@ def create_summary_plot(
     x_positions = list(range(len(files)))
     colors = plt.get_cmap("tab10")
 
-    fig_width = max(14, min(32, len(files) * 0.35 + 8))
+    fig_width = max(14, min(32, len(files) * 0.5 + 8))
     fig, ax = plt.subplots(figsize=(fig_width, 7))
 
-    for index, algorithm_id in enumerate(selected_algorithms):
-        y_values = []
-        for file_record in files:
-            algo_file = file_record["algorithms"].get(algorithm_id)
-            # A multiplicação por 100 foi mantida aqui assumindo que a sua
-            # similaridade global ainda seja um float de 0 a 1. 
-            # Caso não seja, você pode remover o * 100 aqui também.
-            y_values.append((algo_file["similarity"] * 100) if algo_file else None)
+    # Processamento dos resultados de Jplag e Dolos via referência CSV
+    ref_map = {}
+    if reference_csv and reference_csv.exists():
+        with reference_csv.open("r", encoding="utf-8", newline="") as f:
+            for row in csv.DictReader(f):
+                p_id = str(row.get("Problem ID", "")).strip()
+                s_id = str(row.get("Source ID", "")).strip()
+                try:
+                    dolos_val = float(row.get("Dolos Similarity (%)", 0) or 0.0)
+                except ValueError:
+                    dolos_val = 0.0
+                try:
+                    jplag_val = float(row.get("Jplag Similarity (%)", 0) or 0.0)
+                except ValueError:
+                    jplag_val = 0.0
+                ref_map[(p_id, s_id)] = (dolos_val, jplag_val)
 
-        ax.plot(
-            x_positions,
-            y_values,
-            marker="o",
-            linewidth=2.0,
-            markersize=4.5,
-            label=algorithm_id,
-            color=colors(index % 10),
-        )
-
-    # Processamento e injeção da linha do Jplag/Dolos
-    dolos_avg = None
-    jplag_avg = None
-    if reference_csv and reference_csv.exists() and problem_filter != "all":
-        # Extrai o ID numérico do filtro (ex: "problema_2" -> "2")
-        match = re.search(r'\d+', problem_filter)
-        if match:
-            problem_id = match.group(0)
-            dolos_total = 0.0
-            dolos_count = 0
-            jplag_total = 0.0
-            jplag_count = 0
-            with reference_csv.open("r", encoding="utf-8", newline="") as f:
-                for row in csv.DictReader(f):
-                    if row.get("Problem ID") == problem_id:
-                        try:
-                            if "Dolos Similarity (%)" in row and row["Dolos Similarity (%)"].strip():
-                                dolos_total += float(row["Dolos Similarity (%)"])
-                                dolos_count += 1
-                        except ValueError:
-                            pass
-                        
-                        try:
-                            if "Jplag Similarity (%)" in row and row["Jplag Similarity (%)"].strip():
-                                jplag_total += float(row["Jplag Similarity (%)"])
-                                jplag_count += 1
-                        except ValueError:
-                            pass
-            
-            if dolos_count > 0:
-                dolos_avg = dolos_total / dolos_count
-            if jplag_count > 0:
-                jplag_avg = jplag_total / jplag_count
-
-    # Adiciona as linhas tracejadas se os valores forem processados com sucesso
-    if dolos_avg is not None:
-        ax.axhline(
-            y=dolos_avg,
-            color="purple",
-            linestyle="--",
-            linewidth=1.5,
-            alpha=0.7,
-            label=f"Média Dolos ({dolos_avg:.1f}%)"
-        )
+    # Construção das séries de dados (Nossas execuções + Dolos + Jplag)
+    series_list = []
     
-    if jplag_avg is not None:
-        ax.axhline(
-            y=jplag_avg,
-            color="brown",
-            linestyle="-.",
-            linewidth=1.5,
-            alpha=0.7,
-            label=f"Média Jplag ({jplag_avg:.1f}%)"
-        )
+    # 1. Ferramentas do Pipeline (TF-IDF, Diff, SVD, etc)
+    for algo_id in selected_algorithms:
+        y_vals = []
+        for item in files:
+            algo_file = item["algorithms"].get(algo_id)
+            y_vals.append((algo_file["similarity"] * 100) if algo_file else 0.0)
+        series_list.append({"label": algo_id, "values": y_vals})
+
+    # 2. Ferramentas de Referência (se mapeadas no CSV)
+    if ref_map:
+        dolos_vals = []
+        jplag_vals = []
+        for item in files:
+            # Extrai os números do nome do diretório do problema (ex: 'problema_2' -> '2')
+            p_match = re.search(r'\d+', item['problem'])
+            # Extrai os números do nome do source (ex: 'source_7.c' -> '7')
+            s_match = re.search(r'\d+', item['basename'])
+            
+            p_id = p_match.group(0) if p_match else ""
+            s_id = s_match.group(0) if s_match else ""
+
+            val_d, val_j = ref_map.get((p_id, s_id), (0.0, 0.0))
+            dolos_vals.append(val_d)
+            jplag_vals.append(val_j)
+
+        series_list.append({"label": "Dolos", "values": dolos_vals})
+        series_list.append({"label": "Jplag", "values": jplag_vals})
+
+    num_series = len(series_list)
+    bar_width = 0.8 / max(1, num_series)
+
+    for index, series in enumerate(series_list):
+        if plot_style == "bar":
+            offsets = [x + (index - (num_series - 1) / 2) * bar_width for x in x_positions]
+            bars = ax.bar(
+                offsets,
+                series["values"],
+                width=bar_width,
+                label=series["label"],
+                color=colors(index % 10),
+                alpha=0.85,
+            )
+            # Adiciona a porcentagem no topo de cada barra rotacionada em 90 graus
+            for rect in bars:
+                height = rect.get_height()
+                if height > 0:  # Só exibe se houver algum valor maior que zero para manter o visual limpo
+                    ax.annotate(
+                        f'{height:.2f}',
+                        xy=(rect.get_x() + rect.get_width() / 2, height),
+                        xytext=(0, 4),  # 4 pontos de offset vertical
+                        textcoords="offset points",
+                        ha='center', va='bottom',
+                        fontsize=7, rotation=90
+                    )
+        else:
+            ax.plot(
+                x_positions,
+                series["values"],
+                marker="o",
+                linewidth=2.0,
+                markersize=4.5,
+                label=series["label"],
+                color=colors(index % 10),
+            )
+            # Adiciona a porcentagem logo acima dos pontos no gráfico de linhas
+            for x, y in zip(x_positions, series["values"]):
+                if y > 0:
+                    # Pequeno deslocamento lateral para não embolar várias anotações no mesmo X
+                    x_offset = (index - (num_series - 1) / 2) * 0.15 
+                    ax.annotate(
+                        f'{y:.2f}',
+                        xy=(x + x_offset, y),
+                        xytext=(0, 5),
+                        textcoords="offset points",
+                        ha='center', va='bottom',
+                        fontsize=7, rotation=90
+                    )
 
     ax.set_ylabel("Similaridade (%)")
     ax.set_xlabel("Arquivo")
-    ax.set_ylim(0, 100)
+    ax.set_ylim(0, 115) # Dá um respiro de 15% acima do 100 para a fonte em 90 graus não vazar
     ax.set_title(
-        "Similaridade por arquivo"
+        f"Similaridade Comparativa de Ofuscação por Arquivo ({plot_style.capitalize()})"
         + (" - " + problem_filter if problem_filter != "all" else " - todos os problemas")
     )
     ax.set_xticks(x_positions)
     ax.set_xticklabels(labels, rotation=60, ha="right", fontsize=8)
     ax.grid(True, axis="y", alpha=0.25)
     
-    # Ajusta o número de colunas da legenda dependendo de quantas linhas de referência existem
-    extra_legend_items = sum([1 for item in (dolos_avg, jplag_avg) if item is not None])
-    legend_cols = max(1, len(selected_algorithms) + extra_legend_items)
-    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.16), ncol=legend_cols)
+    # Legenda formatada no rodapé
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.16), ncol=max(1, num_series))
     
     fig.tight_layout()
     fig.savefig(output_path, dpi=150, bbox_inches="tight")
@@ -406,7 +436,7 @@ def create_block_plot(
             y_values.append((block["similarity"]) if block else 0.0)
 
         offsets = [x + (index - (len(selected_algorithms) - 1) / 2) * width for x in x_positions]
-        ax.bar(
+        bars = ax.bar(
             offsets,
             y_values,
             width=width,
@@ -414,6 +444,18 @@ def create_block_plot(
             color=colors(index % 10),
             alpha=0.85,
         )
+        
+        for rect in bars:
+            height = rect.get_height()
+            if height > 0:
+                ax.annotate(
+                    f'{height:.2f}',
+                    xy=(rect.get_x() + rect.get_width() / 2, height),
+                    xytext=(0, 4),
+                    textcoords="offset points",
+                    ha='center', va='bottom',
+                    fontsize=7, rotation=90
+                )
 
     tick_labels = []
     for block_key in block_keys:
@@ -424,7 +466,7 @@ def create_block_plot(
 
     ax.set_ylabel("Similaridade do bloco (%)")
     ax.set_xlabel("Blocos alinhados pelo intervalo do bloco original")
-    ax.set_ylim(0, 100)
+    ax.set_ylim(0, 115) # Dá um respiro para o texto rotacionado não encostar no topo
     ax.set_title(f"Comparação por blocos - {file_record['problem']}/{file_record['basename']}")
     ax.set_xticks(x_positions)
     ax.set_xticklabels(tick_labels, rotation=0, fontsize=8)
@@ -474,6 +516,7 @@ def main() -> None:
             problem_filter=problem_value,
             output_path=summary_path,
             reference_csv=reference_csv_path,
+            plot_style=args.plot_style,
         )
         created_files.append(summary_name)
 
@@ -518,6 +561,7 @@ def main() -> None:
             "file": args.file,
             "algorithms": selected_algorithms,
             "mode": args.mode,
+            "plot_style": args.plot_style,
             "created_files": created_files,
         },
     )

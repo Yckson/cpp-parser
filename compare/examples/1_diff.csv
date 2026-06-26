@@ -1,2 +1,10 @@
 file,similarity,matches,original_blocks,obfuscated_blocks
-problema_1/source_1.json,0.5330,37,37,34
+source_1.json,0.5119,37,37,34
+source_1183.json,0.0844,43,5,43
+source_158.json,0.0479,30,2,30
+source_591.json,0.1132,46,9,46
+source_7.json,0.0448,30,2,30
+source_71.json,0.0763,41,6,41
+source_795.json,0.1789,45,10,45
+source_802.json,0.1056,43,8,43
+source_826.json,0.0975,41,6,41

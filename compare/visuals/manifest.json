@@ -1,0 +1,15 @@
+{
+  "input_root": "/home/willyspada/github/cpp-parser/tmp/c",
+  "problem": "problema_2",
+  "file": null,
+  "algorithms": [
+    "1_diff",
+    "3_tfidf",
+    "4_svd"
+  ],
+  "mode": "summary",
+  "plot_style": "line",
+  "created_files": [
+    "summary_problema_2.png"
+  ]
+}

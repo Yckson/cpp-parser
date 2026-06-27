@@ -3,7 +3,6 @@ import argparse
 import csv
 import difflib
 import json
-import re
 
 from difflib import SequenceMatcher
 
@@ -43,45 +42,19 @@ def normalize_text(text):
     if not isinstance(text, str):
         text = str(text)
 
-    text = text.lower()
-
-    # remove prefixos da ofuscação
     text = text.replace(
-        "replacementfor_",
+        "ReplacementFor_",
         ""
     )
 
-    # remove quebras/tabulações
     text = text.replace("\n", " ")
     text = text.replace("\t", " ")
 
-    # remove hexadecimais
-    text = re.sub(
-        r'0x[a-f0-9]+',
-        ' ',
-        text
-    )
-
-    # remove números
-    text = re.sub(
-        r'\d+',
-        ' ',
-        text
-    )
-
-    # remove símbolos excessivos
-    text = re.sub(
-        r'[^a-z_]',
-        ' ',
-        text
-    )
-
-    # remove espaços duplicados
     text = " ".join(
         text.split()
     )
 
-    return text
+    return text.lower()
 
 
 def normalize_tokens(tokens):
@@ -161,78 +134,114 @@ def extract_source_code(
     ]
 
 
+def first_non_space_column(line):
+
+    if not line:
+        return 1
+
+    stripped = line.lstrip()
+
+    if not stripped:
+        return 1
+
+    return (
+        len(line)
+        - len(stripped)
+        + 1
+    )
+
+
 def build_unified_block(
+
     original_lines,
     obfuscated_lines,
+
+    original_path,
+    obfuscated_path,
+
     original_start_line,
     obfuscated_start_line,
-    block_similarity
-):
 
-    result = []
-    
-    orig_clean = [line.replace("\r", "") for line in original_lines]
-    obf_clean = [line.replace("\r", "") for line in obfuscated_lines]
+    similarity_score
+):
 
     original_count = max(
         1,
-        len(orig_clean)
+        len(original_lines)
     )
 
     obfuscated_count = max(
         1,
-        len(obf_clean)
+        len(obfuscated_lines)
     )
 
-    similarity_percent = block_similarity * 100.0
+    original_col = 1
+    obfuscated_col = 1
 
-    result.append(
-        f"@@ "
-        f"-{original_start_line},{original_count} "
-        f"+{obfuscated_start_line},{obfuscated_count} "
-        f"@@ {similarity_percent:.2f}%"
-    )
+    if original_lines:
 
-    # Se o bloco já teve match (> 0)
-    # Mostra a diferença EXATA dentro do bloco pareado usando difflib
-    if block_similarity > 0:
-
-        diff_lines = list(
-            difflib.unified_diff(
-                orig_clean,
-                obf_clean,
-                n=99999,  # Força a inclusão de todas as linhas do bloco
-                lineterm=""
-            )
+        original_col = first_non_space_column(
+            original_lines[0]
         )
 
-        if not diff_lines:
-            # Identicos até nos espaços e letras maísculas
-            for line in orig_clean:
-                result.append(" " + line)
+    if obfuscated_lines:
 
-            if not orig_clean:
-                result.append(" ")
+        obfuscated_col = first_non_space_column(
+            obfuscated_lines[0]
+        )
+
+    similarity_percent = similarity_score * 100.0
+
+    result = []
+
+    result.append(
+        f"--- {original_path}\t"
+        f"{original_start_line}:{original_col}"
+    )
+
+    result.append(
+        f"+++ {obfuscated_path}\t"
+        f"{obfuscated_start_line}:{obfuscated_col}"
+    )
+
+    result.append(
+        f"@@ -{original_start_line},{original_count} "
+        f"+{obfuscated_start_line},{obfuscated_count} @@ "
+        f"{similarity_percent:.2f}%"
+    )
+
+    diff_lines = list(
+        difflib.unified_diff(
+            original_lines,
+            obfuscated_lines,
+            lineterm=""
+        )
+    )
+
+    for line in diff_lines:
+
+        if (
+            line.startswith("---")
+            or line.startswith("+++")
+            or line.startswith("@@")
+        ):
+            continue
+
+        result.append(
+            line
+        )
+
+    if len(result) == 3:
+
+        if original_lines:
+
+            result.append(
+                " " + original_lines[0]
+            )
+
         else:
-            # Pula os cabeçalhos internos do difflib ('---', '+++', '@@')
-            for line in diff_lines[3:]:
-                result.append(line)
 
-        return "\n".join(result)
-
-    # Bloco sem match
-    has_content = False
-
-    for line in orig_clean:
-        result.append("-" + line)
-        has_content = True
-
-    for line in obf_clean:
-        result.append("+" + line)
-        has_content = True
-
-    if not has_content:
-        result.append(" ")
+            result.append(" ")
 
     return "\n".join(result)
 
@@ -499,6 +508,7 @@ def run_compare_pipeline(
     Path(
         diff_dir
     ).mkdir(
+        parents=True,
         exist_ok=True
     )
 
@@ -622,12 +632,14 @@ def run_compare_pipeline(
                     "original": original_block,
                     "obfuscated_block": best_block,
                     "similarity": best_score,
+                    "weight": 1
                 })
             else:
                 matches.append({
                     "original": original_block,
                     "obfuscated_block": None,
                     "similarity": 0.0,
+                    "weight": 0
                 })
 
         for obfuscated_block in obfuscated_blocks:
@@ -636,44 +648,31 @@ def run_compare_pipeline(
                     "original": None,
                     "obfuscated_block": obfuscated_block,
                     "similarity": 0.0,
+                    "weight": 0
                 })
 
-        # ORDENAÇÃO POR LINHA (do script validado)
         matches.sort(
-            key=lambda x: (
-                x["original"]["start_line"]
-                if x["original"] is not None
-                else (
-                    x["obfuscated_block"]["start_line"]
-                    if x["obfuscated_block"] is not None
-                    else 999999999
-                ),
-                x["obfuscated_block"]["start_line"]
-                if x["obfuscated_block"] is not None
-                else 999999999
-            )
+            key=lambda x: x["similarity"],
+            reverse=True,
         )
 
-        average_similarity = 0.0
+        matched = [m for m in matches if m["weight"] == 1]
+        if matched:
 
-        if matches:
             average_similarity = (
                 sum(
                     m["similarity"]
-                    for m in matches
+                    for m in matched
                 )
-                / len(matches)
-            )
+        /
+        len(matched)
+    )
 
+        else:
+
+            average_similarity = 0.0
+        
         result_lines = []
-
-        # HEADER GLOBAL ÚNICO - AGORA COM CAMINHOS ABSOLUTOS
-        result_lines.append(
-            f"--- {original_source_path.resolve()}"
-        )
-        result_lines.append(
-            f"+++ {obfuscated_source_path.resolve()}"
-        )
 
         for match in matches:
             original_block = match["original"]
@@ -686,10 +685,12 @@ def run_compare_pipeline(
                     original_block["start_line"],
                     original_block["end_line"],
                 )
+                original_path = original_source_path.name
                 original_start = original_block["start_line"]
             else:
                 original_lines = []
-                original_start = 1
+                original_path = "Inexistente"
+                original_start = 0
 
             if obfuscated_block:
                 obfuscated_lines = extract_source_code(
@@ -697,22 +698,27 @@ def run_compare_pipeline(
                     obfuscated_block["start_line"],
                     obfuscated_block["end_line"],
                 )
+                obfuscated_path = obfuscated_source_path.name
                 obfuscated_start = obfuscated_block["start_line"]
             else:
                 obfuscated_lines = []
-                obfuscated_start = 1
+                obfuscated_path = "Inexistente"
+                obfuscated_start = 0
 
             unified = build_unified_block(
                 original_lines=original_lines,
                 obfuscated_lines=obfuscated_lines,
+                original_path=original_path,
+                obfuscated_path=obfuscated_path,
                 original_start_line=original_start,
                 obfuscated_start_line=obfuscated_start,
-                block_similarity=similarity_score,
+                similarity_score=similarity_score,
             )
 
             result_lines.append(
                 unified
             )
+            result_lines.append("")
 
         diff_output_path = (
             Path(diff_dir)
@@ -730,10 +736,9 @@ def run_compare_pipeline(
             diff_output_path,
             "w",
             encoding="utf-8",
-            newline="\n"
         ) as f:
             f.write(
-                "\n".join(result_lines) + "\n"
+                "\n".join(result_lines)
             )
 
         csv_rows.append({
